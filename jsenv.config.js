@@ -1,4 +1,5 @@
 const { babelConfigMap } = require("./node_modules/@jsenv/babel-config-map/index.js")
+
 try {
   const importMap = require("./importMap.json")
   exports.importMap = importMap
