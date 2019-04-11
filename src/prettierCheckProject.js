@@ -22,7 +22,7 @@ export const prettierCheckProject = ({
   projectFolder,
   prettifyDescription,
   logErrored = true,
-  logIgnored = true,
+  logIgnored = false,
   logUgly = true,
   logPretty = false,
   logSummary = true,
