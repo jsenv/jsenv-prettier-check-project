@@ -3,7 +3,7 @@ import { STATUS_IGNORED, STATUS_PRETTY, STATUS_UGLY, STATUS_ERRORED } from "./ST
 
 const { resolveConfig, getFileInfo, check } = import.meta.require("prettier")
 
-export const checkFileFormat = async ({ projectFolder, filenameRelative }) => {
+export const prettierCheckFile = async ({ projectFolder, filenameRelative }) => {
   const filename = `${projectFolder}/${filenameRelative}`
 
   try {

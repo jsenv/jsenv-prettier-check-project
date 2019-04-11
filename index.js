@@ -1,1 +1,1 @@
-export { checkFormat } from "./src/checkFormat.js"
+export { prettierCheckProject } from "./src/prettierCheckProject.js"

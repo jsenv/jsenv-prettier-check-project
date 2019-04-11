@@ -8,7 +8,7 @@ import {
   createProcessInterruptionCancellationToken,
 } from "./cancellationHelper.js"
 import { STATUS_ERRORED, STATUS_IGNORED, STATUS_UGLY, STATUS_PRETTY } from "./STATUS.js"
-import { checkFileFormat } from "./checkFileFormat.js"
+import { prettierCheckFile } from "./prettierCheckFile.js"
 import {
   createStartLog,
   createErroredFileLog,
@@ -18,9 +18,9 @@ import {
   createSummaryLog,
 } from "./log.js"
 
-export const checkFormat = ({
+export const prettierCheckProject = ({
   projectFolder,
-  formattableDescription,
+  prettifyDescription,
   logErrored = true,
   logIgnored = true,
   logUgly = true,
@@ -39,11 +39,14 @@ export const checkFormat = ({
       cancellationToken,
       pathname: projectFolder,
       metaDescription: namedValueDescriptionToMetaDescription({
-        formattable: formattableDescription,
+        prettify: prettifyDescription,
       }),
-      predicate: (meta) => meta.formattable === true,
+      predicate: (meta) => meta.prettify === true,
       transformFile: async ({ filenameRelative }) => {
-        const { status, statusDetail } = await checkFileFormat({ projectFolder, filenameRelative })
+        const { status, statusDetail } = await prettierCheckFile({
+          projectFolder,
+          filenameRelative,
+        })
         report[filenameRelative] = { status, statusDetail }
 
         if (status === STATUS_ERRORED) {

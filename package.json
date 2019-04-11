@@ -1,10 +1,10 @@
 {
-  "name": "@jsenv/prettiest",
+  "name": "@jsenv/prettier-check-project",
   "version": "1.0.0",
   "licence": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jsenv/jsenv-prettiest"
+    "url": "https://github.com/jsenv/jsenv-prettier-check-project"
   },
   "publishConfig": {
     "access": "public"

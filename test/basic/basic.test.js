@@ -1,11 +1,11 @@
 import { pathnameToDirname, hrefToPathname } from "@jsenv/module-resolution"
 import { assert } from "@dmail/assert"
-import { checkFormat } from "../../index.js"
+import { prettierCheckProject } from "../../index.js"
 
 const testFolder = pathnameToDirname(hrefToPathname(import.meta.url))
-const actual = await checkFormat({
+const actual = await prettierCheckProject({
   projectFolder: testFolder,
-  formattableDescription: {
+  prettifyDescription: {
     "/**/*.js": true,
     "/basic.test.js": false,
   },
