@@ -9,19 +9,14 @@ import {
   prettyStyleWithIcon,
 } from "./style.js"
 
-export const createStartLog = () => `
--------------- format check start -----------------
-`
-
 export const createSummaryLog = ({
   totalCount,
   erroredCount,
   ignoredCount,
   uglyCount,
   prettyCount,
-}) => `
--------------- format check result ----------------
-${totalCount} files format checked
+}) => `-------------- prettier check project summary ----------------
+${totalCount} files checked
 - ${erroredStyle(`${erroredCount} errored`)}
 - ${ignoredStyle(`${ignoredCount} ignored`)}
 - ${uglyStyle(`${uglyCount} ugly`)}

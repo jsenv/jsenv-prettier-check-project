@@ -10,7 +10,6 @@ import {
 import { STATUS_ERRORED, STATUS_IGNORED, STATUS_UGLY, STATUS_PRETTY } from "./STATUS.js"
 import { prettierCheckFile } from "./prettierCheckFile.js"
 import {
-  createStartLog,
   createErroredFileLog,
   createIgnoredFileLog,
   createUglyFileLog,
@@ -29,8 +28,6 @@ export const prettierCheckProject = ({
   updateProcessExitCode = true,
 }) =>
   catchAsyncFunctionCancellation(async () => {
-    console.log(createStartLog())
-
     projectFolder = normalizePathname(projectFolder)
     const cancellationToken = createProcessInterruptionCancellationToken()
 
