@@ -1,14 +1,9 @@
-const { checkFormat } = require("@jsenv/core")
-const { projectFolder } = require("../../jsenv.config.js")
-
-const formattableDescription = {
+export const DEFAULT_PRETTIFY_META_MAP = {
   // js
   "/index.js": true,
   "/src/**/*.js": true,
   "/test/**/*.js": true,
   "/script/**/*.js": true,
-  "/test/basic/errored.js": false,
-  "/test/basic/ugly.js": false,
   // json
   "/src/**/*.json": true,
   "/test/**/*.json": true,
@@ -20,8 +15,3 @@ const formattableDescription = {
   "/test/**/*.md": true,
   "/script/**/*.md": true,
 }
-
-checkFormat({
-  projectFolder,
-  formattableDescription,
-})

@@ -15,13 +15,11 @@ export const createSummaryLog = ({
   ignoredCount,
   uglyCount,
   prettyCount,
-}) => `-------------- prettier check project summary ----------------
-${totalCount} files checked
+}) => `${totalCount} files checked:
 - ${erroredStyle(`${erroredCount} errored`)}
 - ${ignoredStyle(`${ignoredCount} ignored`)}
 - ${uglyStyle(`${uglyCount} ugly`)}
-- ${prettyStyle(`${prettyCount} pretty`)}
----------------------------------------------------`
+- ${prettyStyle(`${prettyCount} pretty`)}`
 
 export const createErroredFileLog = ({
   filenameRelative,

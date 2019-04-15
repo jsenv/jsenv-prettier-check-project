@@ -4,3 +4,5 @@
 /dist
 /.dist
 /coverage
+/test/basic/ugly.js
+/test/basic/errored.js

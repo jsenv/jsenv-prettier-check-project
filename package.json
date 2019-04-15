@@ -1,6 +1,6 @@
 {
   "name": "@jsenv/prettier-check-project",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "licence": "MIT",
   "repository": {
     "type": "git",
@@ -23,29 +23,29 @@
     "@jsenv/module-resolution": "2.3.0"
   },
   "devDependencies": {
-    "@jsenv/core": "5.2.0",
+    "@jsenv/core": "5.21.0",
     "@jsenv/eslint-config": "8.0.0",
-    "@jsenv/eslint-import-resolver": "4.1.0",
+    "@jsenv/eslint-import-resolver": "4.2.0",
     "@jsenv/prettier-config": "1.0.0",
-    "@jsenv/babel-config-map": "1.0.0",
+    "@jsenv/prettier-check-project": "1.3.0",
+    "@jsenv/codecov-upload": "1.1.0",
     "@dmail/assert": "3.0.0",
     "babel-eslint": "11.0.0-beta.0",
-    "codecov": "2.3.0",
     "eslint": "5.1.0",
     "eslint-plugin-import": "2.6.0",
     "rimraf": "2.6.2"
   },
   "scripts": {
     "generate-import-map": "node ./script/generate-import-map/generate-import-map.js",
-    "lint": "eslint .",
-    "check-format": "node ./script/check-format/check-format.js",
     "test": "node ./script/test/test.js",
+    "eslint-check-project": "eslint .",
+    "prettier-check-project": "node ./script/prettier-check-project/prettier-check-project.js",
     "generate-coverage": "node ./script/generate-coverage/generate-coverage.js",
     "upload-coverage": "node ./script/upload-coverage/upload-coverage.js",
-    "clean": "rimraf dist && rimraf coverage",
     "bundle-node": "node ./script/bundle-node/bundle-node.js",
     "dist": "npm run clean && npm run bundle-node",
-    "prepublishOnly": "npm run dist",
-    "reinstall": "npm run clean && rimraf node_modules && npm install"
+    "clean": "rimraf dist && rimraf coverage",
+    "reinstall": "npm run clean && rimraf node_modules && npm install",
+    "prepublishOnly": "npm run dist"
   }
 }

@@ -5,10 +5,14 @@ import { prettierCheckProject } from "../../index.js"
 const testFolder = pathnameToDirname(hrefToPathname(import.meta.url))
 const actual = await prettierCheckProject({
   projectFolder: testFolder,
-  prettifyDescription: {
+  prettifyMetaMap: {
     "/**/*.js": true,
     "/basic.test.js": false,
   },
+  logUgly: false,
+  logErrored: false,
+  logSummary: false,
+  updateProcessExitCode: false,
 })
 const expected = {
   report: actual.report,

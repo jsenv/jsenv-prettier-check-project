@@ -16,18 +16,23 @@ import {
   createPrettyFileLog,
   createSummaryLog,
 } from "./log.js"
+import { DEFAULT_PRETTIFY_META_MAP } from "./prettier-check-project-constant.js"
 
-export const prettierCheckProject = ({
+export const prettierCheckProject = async ({
   projectFolder,
-  prettifyDescription,
+  prettifyMetaMap = DEFAULT_PRETTIFY_META_MAP,
   logErrored = true,
   logIgnored = false,
   logUgly = true,
   logPretty = false,
   logSummary = true,
   updateProcessExitCode = true,
-}) =>
-  catchAsyncFunctionCancellation(async () => {
+  throwUnhandled = true,
+}) => {
+  if (typeof prettifyMetaMap !== "object")
+    throw new TypeError(`prettifyMetaMap must be an object, got ${prettifyMetaMap}`)
+
+  const start = async () => {
     projectFolder = normalizePathname(projectFolder)
     const cancellationToken = createProcessInterruptionCancellationToken()
 
@@ -36,7 +41,7 @@ export const prettierCheckProject = ({
       cancellationToken,
       pathname: projectFolder,
       metaDescription: namedValueDescriptionToMetaDescription({
-        prettify: prettifyDescription,
+        prettify: prettifyMetaMap,
       }),
       predicate: (meta) => meta.prettify === true,
       transformFile: async ({ filenameRelative }) => {
@@ -78,16 +83,29 @@ export const prettierCheckProject = ({
       console.log(createSummaryLog(summary))
     }
 
-    if (updateProcessExitCode) {
-      if (summary.erroredCount > 0 || summary.uglyCount > 0) {
-        process.exitCode = 1
-      } else {
-        process.exitCode = 0
-      }
-    }
-
     return { report, summary }
-  })
+  }
+  const promise = catchAsyncFunctionCancellation(start)
+
+  if (throwUnhandled) {
+    promise.catch((e) => {
+      setTimeout(() => {
+        throw e
+      })
+    })
+  }
+
+  if (!updateProcessExitCode) return promise
+  const { report, summary } = await promise
+  if (updateProcessExitCode) {
+    if (summary.erroredCount > 0 || summary.uglyCount > 0) {
+      process.exitCode = 1
+    } else {
+      process.exitCode = 0
+    }
+  }
+  return { report, summary }
+}
 
 const summarizeReport = (report) => {
   const filenameRelativeArray = Object.keys(report)
