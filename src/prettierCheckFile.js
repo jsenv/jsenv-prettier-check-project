@@ -1,10 +1,11 @@
 import { readFile } from "fs"
+import { pathnameToFilename } from "@dmail/helper"
 import { STATUS_IGNORED, STATUS_PRETTY, STATUS_UGLY, STATUS_ERRORED } from "./STATUS.js"
 
 const { resolveConfig, getFileInfo, check } = import.meta.require("prettier")
 
 export const prettierCheckFile = async ({ projectFolder, filenameRelative }) => {
-  const filename = `${projectFolder}/${filenameRelative}`
+  const filename = pathnameToFilename(`${projectFolder}/${filenameRelative}`)
 
   try {
     const [source, options, info] = await Promise.all([
@@ -31,9 +32,9 @@ export const prettierCheckFile = async ({ projectFolder, filenameRelative }) => 
   }
 }
 
-const getFileContentAsString = (pathname) =>
+const getFileContentAsString = (filename) =>
   new Promise((resolve, reject) => {
-    readFile(pathname, (error, buffer) => {
+    readFile(filename, (error, buffer) => {
       if (error) {
         reject(error)
       } else {
