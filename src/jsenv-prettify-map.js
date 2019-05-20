@@ -1,4 +1,4 @@
-export const DEFAULT_PRETTIFY_META_MAP = {
+export const jsenvPrettifyMap = {
   // js
   "/index.js": true,
   "/src/**/*.js": true,

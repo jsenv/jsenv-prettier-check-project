@@ -16,11 +16,11 @@ import {
   createPrettyFileLog,
   createSummaryLog,
 } from "./log.js"
-import { DEFAULT_PRETTIFY_META_MAP } from "./prettier-check-project-constant.js"
+import { jsenvPrettifyMap } from "./jsenv-prettify-map.js"
 
 export const prettierCheckProject = async ({
-  projectFolder,
-  prettifyMetaMap = DEFAULT_PRETTIFY_META_MAP,
+  projectPath,
+  prettifyMap = jsenvPrettifyMap,
   logErrored = true,
   logIgnored = false,
   logUgly = true,
@@ -29,25 +29,27 @@ export const prettierCheckProject = async ({
   updateProcessExitCode = true,
   throwUnhandled = true,
 }) => {
-  if (typeof prettifyMetaMap !== "object")
-    throw new TypeError(`prettifyMetaMap must be an object, got ${prettifyMetaMap}`)
+  if (typeof projectPath !== "string")
+    throw new TypeError(`projectPath must be a string, got ${projectPath}`)
+  if (typeof prettifyMap !== "object")
+    throw new TypeError(`prettifyMap must be an object, got ${prettifyMap}`)
 
   const start = async () => {
-    projectFolder = normalizePathname(projectFolder)
+    const projectPathname = normalizePathname(projectPath)
     const cancellationToken = createProcessInterruptionCancellationToken()
 
     const report = {}
     await selectAllFileInsideFolder({
       cancellationToken,
-      pathname: projectFolder,
+      pathname: projectPathname,
       metaDescription: namedValueDescriptionToMetaDescription({
-        prettify: prettifyMetaMap,
+        prettify: prettifyMap,
       }),
       predicate: (meta) => meta.prettify === true,
       transformFile: async ({ filenameRelative }) => {
         const { status, statusDetail } = await prettierCheckFile({
-          projectFolder,
-          filenameRelative,
+          projectPathname,
+          fileRelativePath: `/${filenameRelative}`,
         })
         report[filenameRelative] = { status, statusDetail }
 
@@ -108,23 +110,15 @@ export const prettierCheckProject = async ({
 }
 
 const summarizeReport = (report) => {
-  const filenameRelativeArray = Object.keys(report)
+  const fileArray = Object.keys(report)
 
-  const erroredArray = filenameRelativeArray.filter(
-    (filenameRelativeArray) => report[filenameRelativeArray].status === STATUS_ERRORED,
-  )
-  const ignoredArray = filenameRelativeArray.filter(
-    (filenameRelativeArray) => report[filenameRelativeArray].status === STATUS_IGNORED,
-  )
-  const uglyArray = filenameRelativeArray.filter(
-    (filenameRelativeArray) => report[filenameRelativeArray].status === STATUS_UGLY,
-  )
-  const prettyArray = filenameRelativeArray.filter(
-    (filenameRelativeArray) => report[filenameRelativeArray].status === STATUS_PRETTY,
-  )
+  const erroredArray = fileArray.filter((file) => report[file].status === STATUS_ERRORED)
+  const ignoredArray = fileArray.filter((file) => report[file].status === STATUS_IGNORED)
+  const uglyArray = fileArray.filter((file) => report[file].status === STATUS_UGLY)
+  const prettyArray = fileArray.filter((file) => report[file].status === STATUS_PRETTY)
 
   return {
-    totalCount: filenameRelativeArray.length,
+    totalCount: fileArray.length,
     erroredCount: erroredArray.length,
     ignoredCount: ignoredArray.length,
     uglyCount: uglyArray.length,

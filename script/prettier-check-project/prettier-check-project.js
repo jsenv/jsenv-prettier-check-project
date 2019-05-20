@@ -1,9 +1,9 @@
 const { prettierCheckProject } = require("@jsenv/prettier-check-project")
-const { projectFolder } = require("../../jsenv.config.js")
+const { projectPath } = require("../../jsenv.config.js")
 
 prettierCheckProject({
-  projectFolder,
-  prettifyDescription: {
+  projectFolder: projectPath,
+  prettifyMetaMap: {
     // js
     "/index.js": true,
     "/src/**/*.js": true,

@@ -4,8 +4,8 @@ import { prettierCheckProject } from "../../index.js"
 
 const testFolder = pathnameToDirname(hrefToPathname(import.meta.url))
 const actual = await prettierCheckProject({
-  projectFolder: testFolder,
-  prettifyMetaMap: {
+  projectPath: testFolder,
+  prettifyMap: {
     "/**/*.js": true,
     "/basic.test.js": false,
   },
