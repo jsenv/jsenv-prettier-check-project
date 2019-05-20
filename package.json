@@ -1,6 +1,6 @@
 {
   "name": "@jsenv/prettier-check-project",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "licence": "MIT",
   "repository": {
     "type": "git",
@@ -28,7 +28,7 @@
     "@jsenv/eslint-config": "8.0.0",
     "@jsenv/eslint-import-resolver": "4.2.0",
     "@jsenv/prettier-config": "1.0.0",
-    "@jsenv/prettier-check-project": "1.8.0",
+    "@jsenv/prettier-check-project": "1.9.0",
     "@jsenv/node-module-import-map": "1.1.0",
     "@jsenv/codecov-upload": "1.2.0",
     "@dmail/assert": "3.4.0",
