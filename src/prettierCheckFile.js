@@ -1,11 +1,11 @@
 import { readFile } from "fs"
-import { pathnameToFilename } from "@dmail/helper"
+import { pathnameToOperatingSystemPath } from "@jsenv/operating-system-path"
 import { STATUS_IGNORED, STATUS_PRETTY, STATUS_UGLY, STATUS_ERRORED } from "./STATUS.js"
 
 const { resolveConfig, getFileInfo, check } = import.meta.require("prettier")
 
 export const prettierCheckFile = async ({ projectPathname, fileRelativePath }) => {
-  const filename = pathnameToFilename(`${projectPathname}${fileRelativePath}`)
+  const filename = pathnameToOperatingSystemPath(`${projectPathname}${fileRelativePath}`)
 
   try {
     const [source, options, info] = await Promise.all([

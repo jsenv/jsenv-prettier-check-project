@@ -1,4 +1,4 @@
-import { normalizePathname } from "@jsenv/module-resolution"
+import { operatingSystemPathToPathname } from "@jsenv/operating-system-path"
 import {
   namedValueDescriptionToMetaDescription,
   selectAllFileInsideFolder,
@@ -35,7 +35,7 @@ export const prettierCheckProject = async ({
     throw new TypeError(`prettifyMap must be an object, got ${prettifyMap}`)
 
   const start = async () => {
-    const projectPathname = normalizePathname(projectPath)
+    const projectPathname = operatingSystemPathToPathname(projectPath)
     const cancellationToken = createProcessInterruptionCancellationToken()
 
     const report = {}

@@ -1,5 +1,5 @@
 import { assert } from "@dmail/assert"
-import { importMetaURLToFolderPath } from "../../src/operating-system-path.js"
+import { importMetaURLToFolderPath } from "@jsenv/operating-system-path"
 import { prettierCheckProject } from "../../index.js"
 
 const testFolderPath = importMetaURLToFolderPath(import.meta.url)

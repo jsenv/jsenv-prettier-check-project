@@ -18,10 +18,10 @@
   ],
   "dependencies": {
     "prettier": "1.16.3",
-    "@dmail/project-structure": "4.0.0",
+    "@dmail/project-structure": "4.2.0",
     "@dmail/cancellation": "2.1.0",
-    "@dmail/helper": "2.2.0",
-    "@jsenv/module-resolution": "2.3.0"
+    "@jsenv/module-resolution": "2.3.0",
+    "@jsenv/operating-system-path": "1.0.0"
   },
   "devDependencies": {
     "@jsenv/core": "5.30.0",
