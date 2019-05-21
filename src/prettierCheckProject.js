@@ -41,41 +41,41 @@ export const prettierCheckProject = async ({
     const report = {}
     await selectAllFileInsideFolder({
       cancellationToken,
-      pathname: projectPathname,
+      folderPath: projectPath,
       metaDescription: namedValueDescriptionToMetaDescription({
         prettify: prettifyMap,
       }),
       predicate: (meta) => meta.prettify === true,
-      transformFile: async ({ filenameRelative }) => {
+      transformFile: async ({ relativePath }) => {
         const { status, statusDetail } = await prettierCheckFile({
           projectPathname,
-          fileRelativePath: `/${filenameRelative}`,
+          fileRelativePath: relativePath,
         })
-        report[filenameRelative] = { status, statusDetail }
+        report[relativePath] = { status, statusDetail }
 
         if (status === STATUS_ERRORED) {
           if (logErrored) {
-            console.log(createErroredFileLog({ filenameRelative, statusDetail }))
+            console.log(createErroredFileLog({ relativePath, statusDetail }))
           }
           return
         }
 
         if (status === STATUS_IGNORED) {
           if (logIgnored) {
-            console.log(createIgnoredFileLog({ filenameRelative }))
+            console.log(createIgnoredFileLog({ relativePath }))
           }
           return
         }
 
         if (status === STATUS_UGLY) {
           if (logUgly) {
-            console.log(createUglyFileLog({ filenameRelative }))
+            console.log(createUglyFileLog({ relativePath }))
           }
           return
         }
 
         if (logPretty) {
-          console.log(createPrettyFileLog({ filenameRelative }))
+          console.log(createPrettyFileLog({ relativePath }))
         }
       },
     })

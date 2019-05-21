@@ -21,17 +21,16 @@ export const createSummaryLog = ({
 - ${uglyStyle(`${uglyCount} ugly`)}
 - ${prettyStyle(`${prettyCount} pretty`)}`
 
-export const createErroredFileLog = ({
-  filenameRelative,
-  statusDetail,
-}) => `${filenameRelative} -> ${erroredStyleWithIcon("errored")}
+export const createErroredFileLog = ({ relativePath, statusDetail }) => `${relativePath.slice(
+  1,
+)} -> ${erroredStyleWithIcon("errored")}
 ${statusDetail}`
 
-export const createIgnoredFileLog = ({ filenameRelative }) =>
-  `${filenameRelative} -> ${ignoredStyleWithIcon("ignored")}`
+export const createIgnoredFileLog = ({ relativePath }) =>
+  `${relativePath.slice(1)} -> ${ignoredStyleWithIcon("ignored")}`
 
-export const createUglyFileLog = ({ filenameRelative }) =>
-  `${filenameRelative} -> ${uglyStyleWithIcon("ugly")}`
+export const createUglyFileLog = ({ relativePath }) =>
+  `${relativePath.slice(1)} -> ${uglyStyleWithIcon("ugly")}`
 
-export const createPrettyFileLog = ({ filenameRelative }) =>
-  `${filenameRelative} -> ${prettyStyleWithIcon("pretty")}`
+export const createPrettyFileLog = ({ relativePath }) =>
+  `${relativePath.slice(1)} -> ${prettyStyleWithIcon("pretty")}`

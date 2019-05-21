@@ -1,10 +1,10 @@
-import { pathnameToDirname, hrefToPathname } from "@jsenv/module-resolution"
 import { assert } from "@dmail/assert"
+import { importMetaURLToFolderPath } from "../../src/operating-system-path.js"
 import { prettierCheckProject } from "../../index.js"
 
-const testFolder = pathnameToDirname(hrefToPathname(import.meta.url))
+const testFolderPath = importMetaURLToFolderPath(import.meta.url)
 const actual = await prettierCheckProject({
-  projectPath: testFolder,
+  projectPath: testFolderPath,
   prettifyMap: {
     "/**/*.js": true,
     "/basic.test.js": false,
