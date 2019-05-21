@@ -5,7 +5,7 @@ const { getFromProcessArguments } = require("./getFromProcessArguments.js")
 const filenameRelative = getFromProcessArguments("file")
 
 execute({
-  projectFolder: projectPath,
+  projectPath,
   launch: launchNode,
   fileRelativePath: `/${filenameRelative}`,
   mirrorConsole: true,
