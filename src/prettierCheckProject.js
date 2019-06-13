@@ -1,8 +1,6 @@
 import { operatingSystemPathToPathname } from "@jsenv/operating-system-path"
-import {
-  namedValueDescriptionToMetaDescription,
-  selectAllFileInsideFolder,
-} from "@dmail/project-structure"
+import { namedValueDescriptionToMetaDescription } from "@dmail/project-structure"
+import { matchAllFileInsideFolder } from "@dmail/filesystem-matching"
 import {
   catchAsyncFunctionCancellation,
   createProcessInterruptionCancellationToken,
@@ -39,7 +37,7 @@ export const prettierCheckProject = async ({
     const cancellationToken = createProcessInterruptionCancellationToken()
 
     const report = {}
-    await selectAllFileInsideFolder({
+    await matchAllFileInsideFolder({
       cancellationToken,
       folderPath: projectPath,
       metaDescription: namedValueDescriptionToMetaDescription({
