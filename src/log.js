@@ -15,11 +15,18 @@ export const createSummaryLog = ({
   ignoredCount,
   uglyCount,
   prettyCount,
-}) => `${totalCount} files checked:
-- ${erroredStyle(`${erroredCount} errored`)}
-- ${ignoredStyle(`${ignoredCount} ignored`)}
-- ${uglyStyle(`${uglyCount} ugly`)}
-- ${prettyStyle(`${prettyCount} pretty`)}`
+}) => {
+  const lines = []
+
+  if (erroredCount > 0) lines.push(`- ${erroredStyle(`${erroredCount} errored`)}`)
+  if (ignoredCount > 0) lines.push(`- ${ignoredStyle(`${ignoredCount} ignored`)}`)
+  if (uglyCount > 0) lines.push(`- ${uglyStyle(`${uglyCount} ugly`)}`)
+  if (prettyCount > 0) lines.push(`- ${prettyStyle(`${prettyCount} pretty`)}`)
+
+  return `${totalCount} files checked:
+${lines.join(`
+`)}`
+}
 
 export const createErroredFileLog = ({ relativePath, statusDetail }) => `${relativePath.slice(
   1,
