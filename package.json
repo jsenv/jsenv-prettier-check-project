@@ -1,6 +1,6 @@
 {
   "name": "@jsenv/prettier-check-project",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "licence": "MIT",
   "repository": {
     "type": "git",
@@ -19,7 +19,7 @@
   "dependencies": {
     "prettier": "1.16.3",
     "@dmail/project-structure": "4.2.0",
-    "@dmail/filesystem-matching": "1.0.0",
+    "@dmail/filesystem-matching": "1.1.0",
     "@dmail/cancellation": "2.1.0",
     "@jsenv/module-resolution": "2.3.0",
     "@jsenv/operating-system-path": "2.1.0"

@@ -44,7 +44,7 @@ export const prettierCheckProject = async ({
         prettify: prettifyMap,
       }),
       predicate: (meta) => meta.prettify === true,
-      transformFile: async ({ relativePath }) => {
+      matchingFileOperation: async ({ relativePath }) => {
         const { status, statusDetail } = await prettierCheckFile({
           projectPathname,
           fileRelativePath: relativePath,
