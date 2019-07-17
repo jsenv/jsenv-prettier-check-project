@@ -16,16 +16,65 @@ export const createSummaryLog = ({
   uglyCount,
   prettyCount,
 }) => {
-  const lines = []
+  if (totalCount === 0) return `0 file checked.`
 
-  if (erroredCount > 0) lines.push(`- ${erroredStyle(`${erroredCount} errored`)}`)
-  if (ignoredCount > 0) lines.push(`- ${ignoredStyle(`${ignoredCount} ignored`)}`)
-  if (uglyCount > 0) lines.push(`- ${uglyStyle(`${uglyCount} ugly`)}`)
-  if (prettyCount > 0) lines.push(`- ${prettyStyle(`${prettyCount} pretty`)}`)
+  return `${totalCount} file checked: ${createSummaryDetails({
+    totalCount,
+    erroredCount,
+    ignoredCount,
+    uglyCount,
+    prettyCount,
+  })}`
+}
 
-  return `${totalCount} files checked:
-${lines.join(`
-`)}`
+const createSummaryDetails = ({
+  totalCount,
+  erroredCount,
+  ignoredCount,
+  uglyCount,
+  prettyCount,
+}) => {
+  if (erroredCount === totalCount) {
+    return `all ${erroredStyle("errored")}`
+  }
+  if (ignoredCount === totalCount) {
+    return `all ${ignoredStyle("ignored")}`
+  }
+  if (uglyCount === totalCount) {
+    return `all ${uglyStyle("ugly")}`
+  }
+  if (prettyCount === totalCount) {
+    return `all ${prettyStyle("pretty")}`
+  }
+
+  return createMixedDetails({
+    erroredCount,
+    ignoredCount,
+    uglyCount,
+    prettyCount,
+  })
+}
+
+const createMixedDetails = ({ erroredCount, ignoredCount, uglyCount, prettyCount }) => {
+  const parts = []
+
+  if (erroredCount) {
+    parts.push(`${erroredCount} ${erroredStyle("errored")}`)
+  }
+
+  if (ignoredCount) {
+    parts.push(`${ignoredCount} ${ignoredStyle("ignored")}`)
+  }
+
+  if (uglyCount) {
+    parts.push(`${uglyCount} ${uglyStyle("ugly")}`)
+  }
+
+  if (prettyCount) {
+    parts.push(`${prettyCount} ${prettyStyle("pretty")}`)
+  }
+
+  return `${parts.join(", ")}.`
 }
 
 export const createErroredFileLog = ({ relativePath, statusDetail }) => `${relativePath.slice(
