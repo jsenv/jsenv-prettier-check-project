@@ -18,6 +18,7 @@ import { jsenvPrettifyMap } from "./jsenv-prettify-map.js"
 
 export const prettierCheckProject = async ({
   projectPath,
+  prettierIgnoreRelativePath = "/.prettierignore",
   prettifyMap = jsenvPrettifyMap,
   logErrored = true,
   logIgnored = false,
@@ -48,6 +49,7 @@ export const prettierCheckProject = async ({
         const { status, statusDetail } = await prettierCheckFile({
           projectPathname,
           fileRelativePath: relativePath,
+          prettierIgnoreRelativePath,
         })
         report[relativePath] = { status, statusDetail }
 

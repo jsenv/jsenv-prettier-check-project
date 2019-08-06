@@ -4,14 +4,23 @@ import { STATUS_IGNORED, STATUS_PRETTY, STATUS_UGLY, STATUS_ERRORED } from "./ST
 
 const { resolveConfig, getFileInfo, check } = import.meta.require("prettier")
 
-export const prettierCheckFile = async ({ projectPathname, fileRelativePath }) => {
+export const prettierCheckFile = async ({
+  projectPathname,
+  fileRelativePath,
+  prettierIgnoreRelativePath,
+}) => {
   const filename = pathnameToOperatingSystemPath(`${projectPathname}${fileRelativePath}`)
 
   try {
     const [source, options, info] = await Promise.all([
       getFileContentAsString(filename),
       resolveConfig(filename),
-      getFileInfo(filename),
+      getFileInfo(filename, {
+        ignorePath: pathnameToOperatingSystemPath(
+          `${projectPathname}${prettierIgnoreRelativePath}`,
+        ),
+        withNodeModules: false,
+      }),
     ])
 
     const { ignored } = info
