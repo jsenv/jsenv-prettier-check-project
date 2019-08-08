@@ -1,6 +1,12 @@
 import { readFile } from "fs"
 import { pathnameToOperatingSystemPath } from "@jsenv/operating-system-path"
-import { STATUS_IGNORED, STATUS_PRETTY, STATUS_UGLY, STATUS_ERRORED } from "./STATUS.js"
+import {
+  STATUS_NOT_SUPPORTED,
+  STATUS_IGNORED,
+  STATUS_PRETTY,
+  STATUS_UGLY,
+  STATUS_ERRORED,
+} from "./STATUS.js"
 
 const { resolveConfig, getFileInfo, check } = import.meta.require("prettier")
 
@@ -23,7 +29,14 @@ export const prettierCheckFile = async ({
       }),
     ])
 
-    const { ignored } = info
+    const { ignored, inferredParser } = info
+
+    if (inferredParser === null) {
+      return {
+        status: STATUS_NOT_SUPPORTED,
+      }
+    }
+
     if (ignored) {
       return {
         status: STATUS_IGNORED,

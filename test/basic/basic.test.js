@@ -6,7 +6,7 @@ const testFolderPath = importMetaURLToFolderPath(import.meta.url)
 const actual = await prettierCheckProject({
   projectPath: testFolderPath,
   prettifyMap: {
-    "/**/*.js": true,
+    "/**/*": true,
     "/basic.test.js": false,
   },
   logUgly: false,
@@ -17,11 +17,11 @@ const actual = await prettierCheckProject({
 const expected = {
   report: actual.report,
   summary: {
-    totalCount: 3,
+    totalCount: 6,
     erroredCount: 1,
     ignoredCount: 0,
     uglyCount: 1,
-    prettyCount: 1,
+    prettyCount: 4,
   },
 }
 

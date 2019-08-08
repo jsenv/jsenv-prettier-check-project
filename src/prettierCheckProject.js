@@ -5,7 +5,13 @@ import {
   catchAsyncFunctionCancellation,
   createProcessInterruptionCancellationToken,
 } from "./cancellationHelper.js"
-import { STATUS_ERRORED, STATUS_IGNORED, STATUS_UGLY, STATUS_PRETTY } from "./STATUS.js"
+import {
+  STATUS_NOT_SUPPORTED,
+  STATUS_ERRORED,
+  STATUS_IGNORED,
+  STATUS_UGLY,
+  STATUS_PRETTY,
+} from "./STATUS.js"
 import { prettierCheckFile } from "./prettierCheckFile.js"
 import {
   createErroredFileLog,
@@ -18,6 +24,7 @@ import { jsenvPrettifyMap } from "./jsenv-prettify-map.js"
 
 export const prettierCheckProject = async ({
   projectPath,
+  compileIntoRelativePath = "/.dist",
   prettierIgnoreRelativePath = "/.prettierignore",
   prettifyMap = jsenvPrettifyMap,
   logErrored = true,
@@ -42,7 +49,10 @@ export const prettierCheckProject = async ({
       cancellationToken,
       folderPath: projectPath,
       metaDescription: namedValueDescriptionToMetaDescription({
-        prettify: prettifyMap,
+        prettify: {
+          ...prettifyMap,
+          ...(compileIntoRelativePath ? { [`${compileIntoRelativePath}/`]: false } : {}),
+        },
       }),
       predicate: (meta) => meta.prettify === true,
       matchingFileOperation: async ({ relativePath }) => {
@@ -51,6 +61,11 @@ export const prettierCheckProject = async ({
           fileRelativePath: relativePath,
           prettierIgnoreRelativePath,
         })
+
+        if (status === STATUS_NOT_SUPPORTED) {
+          return
+        }
+
         report[relativePath] = { status, statusDetail }
 
         if (status === STATUS_ERRORED) {

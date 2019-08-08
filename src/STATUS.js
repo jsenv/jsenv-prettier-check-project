@@ -1,3 +1,5 @@
+export const STATUS_NOT_SUPPORTED = "not-supported"
+
 export const STATUS_IGNORED = "ignored"
 
 export const STATUS_PRETTY = "pretty"
