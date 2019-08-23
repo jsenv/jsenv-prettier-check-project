@@ -1,10 +1,10 @@
 import { operatingSystemPathToPathname } from "@jsenv/operating-system-path"
-import { namedValueDescriptionToMetaDescription } from "@dmail/project-structure"
+import { namedMetaToMetaMap } from "@jsenv/url-meta"
 import { matchAllFileInsideFolder } from "@dmail/filesystem-matching"
 import {
   catchAsyncFunctionCancellation,
   createProcessInterruptionCancellationToken,
-} from "./cancellationHelper.js"
+} from "@dmail/cancellation"
 import {
   STATUS_NOT_SUPPORTED,
   STATUS_ERRORED,
@@ -48,7 +48,7 @@ export const prettierCheckProject = async ({
     await matchAllFileInsideFolder({
       cancellationToken,
       folderPath: projectPath,
-      metaDescription: namedValueDescriptionToMetaDescription({
+      metaDescription: namedMetaToMetaMap({
         prettify: {
           ...prettifyMap,
           ...(compileIntoRelativePath ? { [`${compileIntoRelativePath}/`]: false } : {}),
