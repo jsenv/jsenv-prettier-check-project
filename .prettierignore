@@ -1,6 +1,8 @@
 /.dist/
 /coverage/
 /dist/
+/test/basic/errored.js
+/test/basic/ugly.js
 /node_modules/
 /importMap.json
 /jsconfig.json
