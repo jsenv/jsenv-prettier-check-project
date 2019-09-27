@@ -1,5 +1,5 @@
 import { operatingSystemPathToPathname } from "@jsenv/operating-system-path"
-import { namedMetaToMetaMap } from "@jsenv/url-meta"
+import { metaMapToSpecifierMetaMap } from "@jsenv/url-meta"
 import { matchAllFileInsideFolder } from "@dmail/filesystem-matching"
 import {
   catchAsyncFunctionCancellation,
@@ -43,17 +43,18 @@ export const prettierCheckProject = async ({
   const start = async () => {
     const projectPathname = operatingSystemPathToPathname(projectPath)
     const cancellationToken = createProcessInterruptionCancellationToken()
+    const specifierMetaMap = metaMapToSpecifierMetaMap({
+      prettify: {
+        ...prettifyMap,
+        ...(compileIntoRelativePath ? { [`${compileIntoRelativePath}/`]: false } : {}),
+      },
+    })
 
     const report = {}
     await matchAllFileInsideFolder({
       cancellationToken,
       folderPath: projectPath,
-      metaDescription: namedMetaToMetaMap({
-        prettify: {
-          ...prettifyMap,
-          ...(compileIntoRelativePath ? { [`${compileIntoRelativePath}/`]: false } : {}),
-        },
-      }),
+      specifierMetaMap,
       predicate: (meta) => meta.prettify === true,
       matchingFileOperation: async ({ relativePath }) => {
         const { status, statusDetail } = await prettierCheckFile({
