@@ -1,7 +1,7 @@
 # jsenv-prettier-check-project
 
 [![github package](https://img.shields.io/github/package-json/v/jsenv/jsenv-prettier-check-project.svg?label=package&logo=github)](https://github.com/jsenv/jsenv-prettier-check-project/packages)
-[![build](https://travis-ci.com/jsenv/jsenv-prettier-check-project.svg?branch=master)](http://travis-ci.com/jsenv/jsenv-prettier-check-project)
+[![ci status](https://github.com/jsenv/jsenv-prettier-check-project/workflows/ci/badge.svg)](https://github.com/jsenv/jsenv-prettier-check-project/actions)
 [![codecov](https://codecov.io/gh/jsenv/jsenv-prettier-check-project/branch/master/graph/badge.svg)](https://codecov.io/gh/jsenv/jsenv-prettier-check-project)
 
 > Run this during continuous integration to ensure your files respects your prettier configuration.
