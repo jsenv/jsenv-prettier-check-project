@@ -1,6 +1,7 @@
+const { fileURLToPath } = require("url")
 const { prettierCheckProject } = require("@jsenv/prettier-check-project")
-const { projectPath } = require("../../jsenv.config.js")
+const { projectDirectoryUrl } = require("../../jsenv.config.js")
 
 prettierCheckProject({
-  projectPath,
+  projectPath: fileURLToPath(projectDirectoryUrl),
 })

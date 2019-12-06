@@ -1,2 +1,2 @@
-export { jsenvPrettifyMap } from "./src/jsenv-prettify-map.js"
+export { jsenvProjectFilesConfig } from "./src/jsenvProjectFilesConfig.js"
 export { prettierCheckProject } from "./src/prettierCheckProject.js"

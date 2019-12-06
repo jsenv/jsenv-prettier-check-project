@@ -1,13 +1,13 @@
-import { assert } from "@dmail/assert"
-import { importMetaURLToFolderPath } from "@jsenv/operating-system-path"
-import { prettierCheckProject } from "../../index.js"
+import { assert } from "@jsenv/assert"
+import { prettierCheckProject, jsenvProjectFilesConfig } from "../../index.js"
 
-const testFolderPath = importMetaURLToFolderPath(import.meta.url)
+const testDirectoryUrl = import.meta.resolve("./")
+
 const actual = await prettierCheckProject({
-  projectPath: testFolderPath,
-  prettifyMap: {
-    "/**/*": true,
-    "/basic.test.js": false,
+  projectDirectoryUrl: testDirectoryUrl,
+  projectFilesConfig: {
+    ...jsenvProjectFilesConfig,
+    "./basic.test.js": false,
   },
   logUgly: false,
   logErrored: false,
@@ -24,8 +24,4 @@ const expected = {
     prettyCount: 4,
   },
 }
-
-assert({
-  actual,
-  expected,
-})
+assert({ actual, expected })

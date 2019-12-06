@@ -1,4 +1,4 @@
-/.dist
+/.jsenv/
 /coverage/
 /dist/
 /test/basic/errored.js

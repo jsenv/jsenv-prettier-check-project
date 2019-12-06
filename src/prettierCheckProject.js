@@ -1,32 +1,33 @@
-import { operatingSystemPathToPathname } from "@jsenv/operating-system-path"
 import { metaMapToSpecifierMetaMap } from "@jsenv/url-meta"
-import { matchAllFileInsideFolder } from "@dmail/filesystem-matching"
+import { collectFiles } from "@jsenv/file-collector"
 import {
   catchAsyncFunctionCancellation,
-  createProcessInterruptionCancellationToken,
-} from "@dmail/cancellation"
+  createCancellationTokenForProcessSIGINT,
+} from "@jsenv/cancellation"
+import { hasScheme, filePathToUrl, urlToFilePath } from "./internal/urlUtils.js"
 import {
   STATUS_NOT_SUPPORTED,
   STATUS_ERRORED,
   STATUS_IGNORED,
   STATUS_UGLY,
   STATUS_PRETTY,
-} from "./STATUS.js"
-import { prettierCheckFile } from "./prettierCheckFile.js"
+} from "./internal/STATUS.js"
+import { prettierCheckFile } from "./internal/prettierCheckFile.js"
 import {
   createErroredFileLog,
   createIgnoredFileLog,
   createUglyFileLog,
   createPrettyFileLog,
   createSummaryLog,
-} from "./log.js"
-import { jsenvPrettifyMap } from "./jsenv-prettify-map.js"
+} from "./internal/log.js"
+import { jsenvProjectFilesConfig } from "./jsenvProjectFilesConfig.js"
 
 export const prettierCheckProject = async ({
-  projectPath,
-  compileIntoRelativePath = "/.dist",
-  prettierIgnoreRelativePath = "/.prettierignore",
-  prettifyMap = jsenvPrettifyMap,
+  cancellationToken = createCancellationTokenForProcessSIGINT(),
+  projectDirectoryUrl,
+  jsenvDirectoryRelativeUrl = ".jsenv",
+  prettierIgnoreFileRelativeUrl = ".prettierignore",
+  projectFilesConfig = jsenvProjectFilesConfig,
   logErrored = true,
   logIgnored = false,
   logUgly = true,
@@ -35,63 +36,63 @@ export const prettierCheckProject = async ({
   updateProcessExitCode = true,
   throwUnhandled = true,
 }) => {
-  if (typeof projectPath !== "string")
-    throw new TypeError(`projectPath must be a string, got ${projectPath}`)
-  if (typeof prettifyMap !== "object")
-    throw new TypeError(`prettifyMap must be an object, got ${prettifyMap}`)
+  projectDirectoryUrl = normalizeProjectDirectoryUrl(projectDirectoryUrl)
+  if (typeof projectFilesConfig !== "object") {
+    throw new TypeError(`projectFilesConfig must be an object, got ${projectFilesConfig}`)
+  }
 
   const start = async () => {
-    const projectPathname = operatingSystemPathToPathname(projectPath)
-    const cancellationToken = createProcessInterruptionCancellationToken()
     const specifierMetaMap = metaMapToSpecifierMetaMap({
       prettify: {
-        ...prettifyMap,
-        ...(compileIntoRelativePath ? { [`${compileIntoRelativePath}/`]: false } : {}),
+        ...projectFilesConfig,
+        ...(jsenvDirectoryRelativeUrl
+          ? { [ensureTrailingSlash(jsenvDirectoryRelativeUrl)]: false }
+          : {}),
       },
     })
 
     const report = {}
-    await matchAllFileInsideFolder({
+    await collectFiles({
       cancellationToken,
-      folderPath: projectPath,
+      directoryPath: urlToFilePath(projectDirectoryUrl),
       specifierMetaMap,
       predicate: (meta) => meta.prettify === true,
-      matchingFileOperation: async ({ relativePath }) => {
+      matchingFileOperation: async ({ relativeUrl }) => {
         const { status, statusDetail } = await prettierCheckFile({
-          projectPathname,
-          fileRelativePath: relativePath,
-          prettierIgnoreRelativePath,
+          projectDirectoryUrl,
+          fileRelativeUrl: relativeUrl,
+          prettierIgnoreFileRelativeUrl,
         })
 
         if (status === STATUS_NOT_SUPPORTED) {
           return
         }
 
-        report[relativePath] = { status, statusDetail }
+        report[relativeUrl] = { status, statusDetail }
 
         if (status === STATUS_ERRORED) {
           if (logErrored) {
-            console.log(createErroredFileLog({ relativePath, statusDetail }))
+            console.log(createErroredFileLog({ relativeUrl, statusDetail }))
           }
           return
         }
 
         if (status === STATUS_IGNORED) {
           if (logIgnored) {
-            console.log(createIgnoredFileLog({ relativePath }))
+            console.log(createIgnoredFileLog({ relativeUrl }))
           }
           return
         }
 
         if (status === STATUS_UGLY) {
           if (logUgly) {
-            console.log(createUglyFileLog({ relativePath }))
+            console.log(createUglyFileLog({ relativeUrl }))
           }
           return
         }
 
         if (logPretty) {
-          console.log(createPrettyFileLog({ relativePath }))
+          console.log(createPrettyFileLog({ relativeUrl }))
         }
       },
     })
@@ -123,6 +124,28 @@ export const prettierCheckProject = async ({
     }
   }
   return { report, summary }
+}
+
+const normalizeProjectDirectoryUrl = (value) => {
+  if (value instanceof URL) {
+    value = value.href
+  }
+
+  if (typeof value === "string") {
+    const url = hasScheme(value) ? value : filePathToUrl(value)
+
+    if (!url.startsWith("file://")) {
+      throw new Error(`projectDirectoryUrl must starts with file://, received ${value}`)
+    }
+
+    return ensureTrailingSlash(value)
+  }
+
+  throw new TypeError(`projectDirectoryUrl must be a string or an url, received ${value}`)
+}
+
+const ensureTrailingSlash = (string) => {
+  return string.endsWith("/") ? string : `${string}/`
 }
 
 const summarizeReport = (report) => {
