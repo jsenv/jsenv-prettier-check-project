@@ -1,6 +1,6 @@
 {
   "name": "@jsenv/prettier-check-project",
-  "version": "3.5.0",
+  "version": "4.0.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -19,9 +19,9 @@
   ],
   "scripts": {
     "test": "node ./script/test/test.js",
+    "test-with-coverage": "node ./script/test/test.js --coverage",
     "eslint-check": "eslint .",
     "prettier-check": "node ./script/prettier-check/prettier-check.js",
-    "generate-coverage": "node ./script/generate-coverage/generate-coverage.js",
     "upload-coverage": "node ./script/upload-coverage/upload-coverage.js",
     "generate-commonjs-bundle": "node ./script/generate-commonjs-bundle/generate-commonjs-bundle.js",
     "generate-import-map": "node ./script/generate-import-map/generate-import-map.js",
@@ -32,26 +32,25 @@
     "prepublishOnly": "node ./script/transform-package/remove-postinstall.js && npm run dist",
     "postpublish": "node ./script/transform-package/restore-postinstall.js"
   },
+  "peerDependencies": {
+    "prettier": "1.x"
+  },
   "dependencies": {
-    "@dmail/cancellation": "2.6.0",
-    "@dmail/filesystem-matching": "1.5.0",
-    "@jsenv/operating-system-path": "2.5.0",
-    "@jsenv/url-meta": "3.0.0",
-    "prettier": "1.18.2"
+    "@jsenv/cancellation": "1.1.0",
+    "@jsenv/file-collector": "1.1.0",
+    "@jsenv/url-meta": "4.1.0"
   },
   "devDependencies": {
-    "@dmail/assert": "3.14.0",
-    "@jsenv/bundling": "6.3.0",
-    "@jsenv/codecov-upload": "1.9.0",
-    "@jsenv/eslint-config": "10.2.0",
-    "@jsenv/execution": "6.1.0",
-    "@jsenv/node-launcher": "4.20.0",
-    "@jsenv/node-module-import-map": "7.2.0",
-    "@jsenv/prettier-config": "1.0.0",
+    "@jsenv/assert": "1.1.1",
+    "@jsenv/codecov-upload": "2.0.0",
+    "@jsenv/core": "10.0.0-alpha.11",
+    "@jsenv/eslint-config": "11.3.0",
+    "@jsenv/node-module-import-map": "8.6.0",
+    "@jsenv/prettier-config": "1.1.0",
     "@jsenv/prettier-check-project": "3.5.0",
-    "@jsenv/testing": "3.6.0",
     "babel-eslint": "11.0.0-beta.0",
-    "eslint": "6.5.0",
+    "eslint": "6.7.2",
+    "prettier": "1.19.1",
     "rimraf": "3.0.0"
   }
 }

@@ -15,13 +15,13 @@ You can use this to ensure your source files are respects prettier format.<br />
 Create a file like this:
 
 ```js
-const { prettierCheckProject, jsenvPrettifyMap } = require("@jsenv/prettier-check-project")
+const { prettierCheckProject, jsenvProjectFilesConfig } = require("@jsenv/prettier-check-project")
 
 prettierCheckProject({
-  projectPath: "/Users/you/folder",
-  prettifyMap: {
-    ...jsenvPrettifyMap,
-    "/.cache/": false,
+  projectDirectoryUrl: "file:///Users/you/folder/ ",
+  projectFilesConfig: {
+    ...jsenvProjectFilesConfig,
+    "./.cache/": false,
   },
 })
 ```
@@ -32,13 +32,13 @@ By default the script will set process.exitCode to 1 if one or more file are not
 You can control this by passing `updateProcessExitCode`.
 
 ```js
-const { prettierCheckProject } = require("@jsenv/prettier-check-project")
+const { prettierCheckProject, jsenvProjectFilesConfig } = require("@jsenv/prettier-check-project")
 
 prettierCheckProject({
-  projectPath: "/Users/you/folder",
-  prettifyMap: {
-    ...jsenvPrettifyMap,
-    "/.cache/": false,
+  projectDirectoryUrl: "file:///Users/you/folder/",
+  projectFilesConfig: {
+    ...jsenvProjectFilesConfig,
+    "./.cache/": false,
   },
   updateProcessExitCode: false,
 })
@@ -47,5 +47,5 @@ prettierCheckProject({
 ## Installation
 
 ```console
-npm install @jsenv/prettier-check-project@2.9.0
+npm install @jsenv/prettier-check-project@4.0.0
 ```

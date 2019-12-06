@@ -77,16 +77,17 @@ const createMixedDetails = ({ erroredCount, ignoredCount, uglyCount, prettyCount
   return `${parts.join(", ")}.`
 }
 
-export const createErroredFileLog = ({ relativePath, statusDetail }) => `${relativePath.slice(
-  1,
-)} -> ${erroredStyleWithIcon("errored")}
+export const createErroredFileLog = ({
+  relativeUrl,
+  statusDetail,
+}) => `${relativeUrl} -> ${erroredStyleWithIcon("errored")}
 ${statusDetail}`
 
-export const createIgnoredFileLog = ({ relativePath }) =>
-  `${relativePath.slice(1)} -> ${ignoredStyleWithIcon("ignored")}`
+export const createIgnoredFileLog = ({ relativeUrl }) =>
+  `${relativeUrl} -> ${ignoredStyleWithIcon("ignored")}`
 
-export const createUglyFileLog = ({ relativePath }) =>
-  `${relativePath.slice(1)} -> ${uglyStyleWithIcon("ugly")}`
+export const createUglyFileLog = ({ relativeUrl }) =>
+  `${relativeUrl} -> ${uglyStyleWithIcon("ugly")}`
 
-export const createPrettyFileLog = ({ relativePath }) =>
-  `${relativePath.slice(1)} -> ${prettyStyleWithIcon("pretty")}`
+export const createPrettyFileLog = ({ relativeUrl }) =>
+  `${relativeUrl} -> ${prettyStyleWithIcon("pretty")}`

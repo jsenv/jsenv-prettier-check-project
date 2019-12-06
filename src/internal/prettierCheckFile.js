@@ -1,5 +1,4 @@
 import { readFile } from "fs"
-import { pathnameToOperatingSystemPath } from "@jsenv/operating-system-path"
 import {
   STATUS_NOT_SUPPORTED,
   STATUS_IGNORED,
@@ -7,24 +6,26 @@ import {
   STATUS_UGLY,
   STATUS_ERRORED,
 } from "./STATUS.js"
+import { resolveUrl, urlToFilePath } from "./urlUtils.js"
 
 const { resolveConfig, getFileInfo, check } = import.meta.require("prettier")
 
 export const prettierCheckFile = async ({
-  projectPathname,
-  fileRelativePath,
-  prettierIgnoreRelativePath,
+  projectDirectoryUrl,
+  fileRelativeUrl,
+  prettierIgnoreFileRelativeUrl,
 }) => {
-  const filename = pathnameToOperatingSystemPath(`${projectPathname}${fileRelativePath}`)
+  const fileUrl = resolveUrl(fileRelativeUrl, projectDirectoryUrl)
+  const filePath = urlToFilePath(fileUrl)
+  const prettierIgnoreFileUrl = resolveUrl(prettierIgnoreFileRelativeUrl, projectDirectoryUrl)
+  const prettierIgnoreFilePath = urlToFilePath(prettierIgnoreFileUrl)
 
   try {
     const [source, options, info] = await Promise.all([
-      getFileContentAsString(filename),
-      resolveConfig(filename),
-      getFileInfo(filename, {
-        ignorePath: pathnameToOperatingSystemPath(
-          `${projectPathname}${prettierIgnoreRelativePath}`,
-        ),
+      getFileContentAsString(filePath),
+      resolveConfig(filePath),
+      getFileInfo(filePath, {
+        ignorePath: prettierIgnoreFilePath,
         withNodeModules: false,
       }),
     ])
@@ -42,7 +43,7 @@ export const prettierCheckFile = async ({
         status: STATUS_IGNORED,
       }
     }
-    const pretty = check(source, { ...options, filepath: filename })
+    const pretty = check(source, { ...options, filepath: filePath })
     return {
       status: pretty ? STATUS_PRETTY : STATUS_UGLY,
     }
