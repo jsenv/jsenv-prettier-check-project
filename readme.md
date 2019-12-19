@@ -18,7 +18,7 @@ Create a file like this:
 const { prettierCheckProject, jsenvProjectFilesConfig } = require("@jsenv/prettier-check-project")
 
 prettierCheckProject({
-  projectDirectoryUrl: "file:///Users/you/folder/ ",
+  projectDirectoryUrl: "file:///Users/you/directory",
   projectFilesConfig: {
     ...jsenvProjectFilesConfig,
     "./.cache/": false,
