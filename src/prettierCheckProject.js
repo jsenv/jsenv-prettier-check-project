@@ -4,7 +4,7 @@ import {
   catchAsyncFunctionCancellation,
   createCancellationTokenForProcessSIGINT,
 } from "@jsenv/cancellation"
-import { hasScheme, filePathToUrl, urlToFilePath } from "./internal/urlUtils.js"
+import { hasScheme, filePathToUrl } from "./internal/urlUtils.js"
 import {
   STATUS_NOT_SUPPORTED,
   STATUS_ERRORED,
@@ -34,14 +34,13 @@ export const prettierCheckProject = async ({
   logPretty = false,
   logSummary = true,
   updateProcessExitCode = true,
-  throwUnhandled = true,
 }) => {
   projectDirectoryUrl = normalizeProjectDirectoryUrl(projectDirectoryUrl)
   if (typeof projectFilesConfig !== "object") {
     throw new TypeError(`projectFilesConfig must be an object, got ${projectFilesConfig}`)
   }
 
-  const start = async () => {
+  return catchAsyncFunctionCancellation(async () => {
     const specifierMetaMap = metaMapToSpecifierMetaMap({
       prettify: {
         ...projectFilesConfig,
@@ -54,7 +53,7 @@ export const prettierCheckProject = async ({
     const report = {}
     await collectFiles({
       cancellationToken,
-      directoryPath: urlToFilePath(projectDirectoryUrl),
+      directoryUrl: projectDirectoryUrl,
       specifierMetaMap,
       predicate: (meta) => meta.prettify === true,
       matchingFileOperation: async ({ relativeUrl }) => {
@@ -102,28 +101,16 @@ export const prettierCheckProject = async ({
       console.log(createSummaryLog(summary))
     }
 
-    return { report, summary }
-  }
-  const promise = catchAsyncFunctionCancellation(start)
-
-  if (throwUnhandled) {
-    promise.catch((e) => {
-      setTimeout(() => {
-        throw e
-      })
-    })
-  }
-
-  if (!updateProcessExitCode) return promise
-  const { report, summary } = await promise
-  if (updateProcessExitCode) {
-    if (summary.erroredCount > 0 || summary.uglyCount > 0) {
-      process.exitCode = 1
-    } else {
-      process.exitCode = 0
+    if (updateProcessExitCode) {
+      if (summary.erroredCount > 0 || summary.uglyCount > 0) {
+        process.exitCode = 1
+      } else {
+        process.exitCode = 0
+      }
     }
-  }
-  return { report, summary }
+
+    return { report, summary }
+  })
 }
 
 const normalizeProjectDirectoryUrl = (value) => {
@@ -138,7 +125,7 @@ const normalizeProjectDirectoryUrl = (value) => {
       throw new Error(`projectDirectoryUrl must starts with file://, received ${value}`)
     }
 
-    return ensureTrailingSlash(value)
+    return ensureTrailingSlash(url)
   }
 
   throw new TypeError(`projectDirectoryUrl must be a string or an url, received ${value}`)

@@ -1,5 +1,7 @@
+!./github/
 /.jsenv/
 /coverage/
 /dist/
 /test/basic/errored.js
 /node_modules/
+!.eslintrc.js
