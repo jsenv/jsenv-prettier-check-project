@@ -4,7 +4,7 @@ import {
   catchAsyncFunctionCancellation,
   createCancellationTokenForProcessSIGINT,
 } from "@jsenv/cancellation"
-import { hasScheme, filePathToUrl, urlToFilePath } from "./internal/urlUtils.js"
+import { hasScheme, filePathToUrl } from "./internal/urlUtils.js"
 import {
   STATUS_NOT_SUPPORTED,
   STATUS_ERRORED,
