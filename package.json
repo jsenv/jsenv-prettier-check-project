@@ -1,7 +1,7 @@
 {
   "name": "@jsenv/prettier-check-project",
   "description": "Format staged or project files with prettier.",
-  "version": "5.0.0-alpha.1",
+  "version": "5.0.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -50,7 +50,7 @@
     "@jsenv/codecov-upload": "3.1.0",
     "@jsenv/core": "10.5.0",
     "@jsenv/eslint-config": "12.1.0",
-    "@jsenv/git-hooks": "1.0.0",
+    "@jsenv/git-hooks": "1.1.0",
     "@jsenv/github-release-package": "1.1.1",
     "@jsenv/node-module-import-map": "10.0.0",
     "@jsenv/package-publish": "1.2.0",
