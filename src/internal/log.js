@@ -16,9 +16,9 @@ export const createSummaryLog = ({
   uglyCount,
   prettyCount,
 }) => {
-  if (totalCount === 0) return `0 file checked.`
+  if (totalCount === 0) return `done.`
 
-  return `${totalCount} file checked: ${createSummaryDetails({
+  return `${createSummaryDetails({
     totalCount,
     erroredCount,
     ignoredCount,
@@ -41,10 +41,10 @@ const createSummaryDetails = ({
     return `all ${ignoredStyle("ignored")}`
   }
   if (uglyCount === totalCount) {
-    return `all ${uglyStyle("ugly")}`
+    return `all ${uglyStyle("needs formatting")}`
   }
   if (prettyCount === totalCount) {
-    return `all ${prettyStyle("pretty")}`
+    return `all ${prettyStyle("already formatted")}`
   }
 
   return createMixedDetails({
@@ -67,11 +67,11 @@ const createMixedDetails = ({ erroredCount, ignoredCount, uglyCount, prettyCount
   }
 
   if (uglyCount) {
-    parts.push(`${uglyCount} ${uglyStyle("ugly")}`)
+    parts.push(`${uglyCount} ${uglyStyle("needs formatting")}`)
   }
 
   if (prettyCount) {
-    parts.push(`${prettyCount} ${prettyStyle("pretty")}`)
+    parts.push(`${prettyCount} ${prettyStyle("already formatted")}`)
   }
 
   return `${parts.join(", ")}.`
@@ -87,7 +87,7 @@ export const createIgnoredFileLog = ({ relativeUrl }) =>
   `${relativeUrl} -> ${ignoredStyleWithIcon("ignored")}`
 
 export const createUglyFileLog = ({ relativeUrl }) =>
-  `${relativeUrl} -> ${uglyStyleWithIcon("ugly")}`
+  `${relativeUrl} -> ${uglyStyleWithIcon("needs formatting")}`
 
 export const createPrettyFileLog = ({ relativeUrl }) =>
-  `${relativeUrl} -> ${prettyStyleWithIcon("pretty")}`
+  `${relativeUrl} -> ${prettyStyleWithIcon("already formatted")}`

@@ -4,7 +4,7 @@ import {
   catchAsyncFunctionCancellation,
   createCancellationTokenForProcessSIGINT,
 } from "@jsenv/cancellation"
-import { hasScheme, filePathToUrl } from "./internal/urlUtils.js"
+import { createLogger } from "@jsenv/logger"
 import {
   STATUS_NOT_SUPPORTED,
   STATUS_ERRORED,
@@ -12,7 +12,6 @@ import {
   STATUS_UGLY,
   STATUS_PRETTY,
 } from "./internal/STATUS.js"
-import { prettierCheckFile } from "./internal/prettierCheckFile.js"
 import {
   createErroredFileLog,
   createIgnoredFileLog,
@@ -20,47 +19,77 @@ import {
   createPrettyFileLog,
   createSummaryLog,
 } from "./internal/log.js"
+import { collectStagedFiles } from "./internal/collectStagedFiles.js"
 import { jsenvProjectFilesConfig } from "./jsenvProjectFilesConfig.js"
+import { resolveUrl, assertAndNormalizeDirectoryUrl } from "@jsenv/util"
+import { generatePrettierReportForFile } from "./internal/generatePrettierReportForFile.js"
 
-export const prettierCheckProject = async ({
+const { format } = import.meta.require("prettier")
+
+export const formatWithPrettier = async ({
+  logLevel,
   cancellationToken = createCancellationTokenForProcessSIGINT(),
   projectDirectoryUrl,
   jsenvDirectoryRelativeUrl = ".jsenv",
   prettierIgnoreFileRelativeUrl = ".prettierignore",
   projectFilesConfig = jsenvProjectFilesConfig,
+  staged = process.execArgv.includes("--staged"),
+  check = process.execArgv.includes("--check"),
   logErrored = true,
   logIgnored = false,
-  logUgly = true,
+  logUgly = false,
   logPretty = false,
   logSummary = true,
-  updateProcessExitCode = true,
+  updateProcessExitCode = false,
 }) => {
-  projectDirectoryUrl = normalizeProjectDirectoryUrl(projectDirectoryUrl)
+  const logger = createLogger({ logLevel })
+
+  projectDirectoryUrl = assertAndNormalizeDirectoryUrl(projectDirectoryUrl)
   if (typeof projectFilesConfig !== "object") {
     throw new TypeError(`projectFilesConfig must be an object, got ${projectFilesConfig}`)
   }
+
+  const prettierIgnoreFileUrl = resolveUrl(prettierIgnoreFileRelativeUrl, projectDirectoryUrl)
 
   return catchAsyncFunctionCancellation(async () => {
     const specifierMetaMap = metaMapToSpecifierMetaMap({
       prettify: {
         ...projectFilesConfig,
         ...(jsenvDirectoryRelativeUrl
-          ? { [ensureTrailingSlash(jsenvDirectoryRelativeUrl)]: false }
+          ? { [ensureUrlTrailingSlash(jsenvDirectoryRelativeUrl)]: false }
           : {}),
       },
     })
 
+    let files
+    if (staged) {
+      files = await collectStagedFiles({
+        cancellationToken,
+        projectDirectoryUrl,
+        specifierMetaMap,
+        predicate: (meta) => meta.prettify === true,
+      })
+    } else {
+      files = await collectFiles({
+        cancellationToken,
+        directoryUrl: projectDirectoryUrl,
+        specifierMetaMap,
+        predicate: (meta) => meta.prettify === true,
+      })
+    }
+
+    if (files.length === 0) {
+      logger.info(`no file format to check.`)
+    } else {
+      logger.info(`checking ${files.length} files format.`)
+    }
+
     const report = {}
-    await collectFiles({
-      cancellationToken,
-      directoryUrl: projectDirectoryUrl,
-      specifierMetaMap,
-      predicate: (meta) => meta.prettify === true,
-      matchingFileOperation: async ({ relativeUrl }) => {
-        const { status, statusDetail } = await prettierCheckFile({
-          projectDirectoryUrl,
-          fileRelativeUrl: relativeUrl,
-          prettierIgnoreFileRelativeUrl,
+    await Promise.all(
+      files.map(async ({ relativeUrl }) => {
+        const fileUrl = resolveUrl(relativeUrl, projectDirectoryUrl)
+        const { status, statusDetail } = await generatePrettierReportForFile(fileUrl, {
+          prettierIgnoreFileUrl,
         })
 
         if (status === STATUS_NOT_SUPPORTED) {
@@ -71,34 +100,52 @@ export const prettierCheckProject = async ({
 
         if (status === STATUS_ERRORED) {
           if (logErrored) {
-            console.log(createErroredFileLog({ relativeUrl, statusDetail }))
+            logger.error(createErroredFileLog({ relativeUrl, statusDetail }))
           }
           return
         }
 
         if (status === STATUS_IGNORED) {
           if (logIgnored) {
-            console.log(createIgnoredFileLog({ relativeUrl }))
+            logger.debug(createIgnoredFileLog({ relativeUrl }))
           }
           return
         }
 
         if (status === STATUS_UGLY) {
           if (logUgly) {
-            console.log(createUglyFileLog({ relativeUrl }))
+            logger.info(createUglyFileLog({ relativeUrl }))
           }
           return
         }
 
         if (logPretty) {
-          console.log(createPrettyFileLog({ relativeUrl }))
+          logger.debug(createPrettyFileLog({ relativeUrl }))
         }
-      },
-    })
+      }),
+    )
 
     const summary = summarizeReport(report)
     if (logSummary) {
-      console.log(createSummaryLog(summary))
+      logger.info(createSummaryLog(summary))
+    }
+
+    if (!check) {
+      const filesToFormat = Object.keys(report).filter(
+        (file) => report[file].status === STATUS_UGLY,
+      )
+      if (filesToFormat.length) {
+        logger.info(`formatting ${filesToFormat.length} files`)
+        await Promise.all(
+          filesToFormat.map(async (fileRelativeUrl) => {
+            logger.info(`format ${fileRelativeUrl}`)
+            const fileUrl = resolveUrl(fileRelativeUrl, projectDirectoryUrl)
+            const options = report[fileRelativeUrl].options
+            await format(fileUrl, options)
+          }),
+        )
+        logger.info("formatting done.")
+      }
     }
 
     if (updateProcessExitCode) {
@@ -111,28 +158,6 @@ export const prettierCheckProject = async ({
 
     return { report, summary }
   })
-}
-
-const normalizeProjectDirectoryUrl = (value) => {
-  if (value instanceof URL) {
-    value = value.href
-  }
-
-  if (typeof value === "string") {
-    const url = hasScheme(value) ? value : filePathToUrl(value)
-
-    if (!url.startsWith("file://")) {
-      throw new Error(`projectDirectoryUrl must starts with file://, received ${value}`)
-    }
-
-    return ensureTrailingSlash(url)
-  }
-
-  throw new TypeError(`projectDirectoryUrl must be a string or an url, received ${value}`)
-}
-
-const ensureTrailingSlash = (string) => {
-  return string.endsWith("/") ? string : `${string}/`
 }
 
 const summarizeReport = (report) => {
@@ -150,4 +175,8 @@ const summarizeReport = (report) => {
     uglyCount: uglyArray.length,
     prettyCount: prettyArray.length,
   }
+}
+
+const ensureUrlTrailingSlash = (url) => {
+  return url.endsWith("/") ? url : `${url}/`
 }
