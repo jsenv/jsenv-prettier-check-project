@@ -1,5 +1,4 @@
 import { metaMapToSpecifierMetaMap } from "@jsenv/url-meta"
-import { collectFiles } from "@jsenv/file-collector"
 import {
   catchAsyncFunctionCancellation,
   createCancellationTokenForProcessSIGINT,
@@ -11,6 +10,7 @@ import {
   STATUS_IGNORED,
   STATUS_UGLY,
   STATUS_PRETTY,
+  STATUS_FORMATTED,
 } from "./internal/STATUS.js"
 import {
   createErroredFileLog,
@@ -18,8 +18,10 @@ import {
   createUglyFileLog,
   createPrettyFileLog,
   createSummaryLog,
+  createFormattedFileLog,
 } from "./internal/log.js"
 import { collectStagedFiles } from "./internal/collectStagedFiles.js"
+import { collectProjectFiles } from "./internal/collectProjectFiles.js"
 import { jsenvProjectFilesConfig } from "./jsenvProjectFilesConfig.js"
 import {
   resolveUrl,
@@ -42,7 +44,8 @@ export const formatWithPrettier = async ({
   check = process.execArgv.includes("--check"),
   logErrored = true,
   logIgnored = false,
-  logUgly = false,
+  logUgly = true,
+  logFormatted = true,
   logPretty = false,
   logSummary = true,
   updateProcessExitCode = false,
@@ -75,9 +78,9 @@ export const formatWithPrettier = async ({
         predicate: (meta) => meta.prettify === true,
       })
     } else {
-      files = await collectFiles({
+      files = await collectProjectFiles({
         cancellationToken,
-        directoryUrl: projectDirectoryUrl,
+        projectDirectoryUrl,
         specifierMetaMap,
         predicate: (meta) => meta.prettify === true,
       })
@@ -91,12 +94,12 @@ export const formatWithPrettier = async ({
 
     const report = {}
     await Promise.all(
-      files.map(async ({ relativeUrl }) => {
+      files.map(async (relativeUrl) => {
         const fileUrl = resolveUrl(relativeUrl, projectDirectoryUrl)
         const prettierReport = await generatePrettierReportForFile(fileUrl, {
           prettierIgnoreFileUrl,
         })
-        const { status, statusDetail } = prettierReport
+        const { status, statusDetail, options, source } = prettierReport
 
         if (status === STATUS_NOT_SUPPORTED) {
           return
@@ -119,8 +122,21 @@ export const formatWithPrettier = async ({
         }
 
         if (status === STATUS_UGLY) {
-          if (logUgly) {
-            logger.info(createUglyFileLog({ relativeUrl }))
+          if (check) {
+            if (logUgly) {
+              logger.info(createUglyFileLog({ relativeUrl }))
+            }
+            return
+          }
+
+          const sourceFormatted = await format(source, {
+            ...options,
+            filepath: urlToFileSystemPath(fileUrl),
+          })
+          await writeFile(fileUrl, sourceFormatted)
+          prettierReport.status = STATUS_FORMATTED
+          if (logFormatted) {
+            logger.info(createFormattedFileLog({ relativeUrl }))
           }
           return
         }
@@ -132,33 +148,8 @@ export const formatWithPrettier = async ({
     )
 
     const summary = summarizeReport(report)
-    if (logSummary) {
-      logger.info(createSummaryLog(summary))
-    }
-
-    if (!check) {
-      const filesToFormat = Object.keys(report).filter(
-        (file) => report[file].status === STATUS_UGLY,
-      )
-      if (filesToFormat.length) {
-        await Promise.all(
-          filesToFormat.map(async (fileRelativeUrl) => {
-            const fileUrl = resolveUrl(fileRelativeUrl, projectDirectoryUrl)
-            const { source, options } = report[fileRelativeUrl]
-            try {
-              const sourceFormatted = await format(source, {
-                ...options,
-                filepath: urlToFileSystemPath(fileUrl),
-              })
-              await writeFile(fileUrl, sourceFormatted)
-              logger.info(`format ${fileRelativeUrl} -> ok`)
-            } catch (e) {
-              logger.info(`format ${fileRelativeUrl} -> error
-${e.stack}`)
-            }
-          }),
-        )
-      }
+    if (files.length && logSummary) {
+      logger.info(`${createSummaryLog(summary)}`)
     }
 
     if (updateProcessExitCode) {
@@ -179,6 +170,7 @@ const summarizeReport = (report) => {
   const erroredArray = fileArray.filter((file) => report[file].status === STATUS_ERRORED)
   const ignoredArray = fileArray.filter((file) => report[file].status === STATUS_IGNORED)
   const uglyArray = fileArray.filter((file) => report[file].status === STATUS_UGLY)
+  const formattedArray = fileArray.filter((file) => report[file].status === STATUS_FORMATTED)
   const prettyArray = fileArray.filter((file) => report[file].status === STATUS_PRETTY)
 
   return {
@@ -186,6 +178,7 @@ const summarizeReport = (report) => {
     erroredCount: erroredArray.length,
     ignoredCount: ignoredArray.length,
     uglyCount: uglyArray.length,
+    formattedCount: formattedArray.length,
     prettyCount: prettyArray.length,
   }
 }

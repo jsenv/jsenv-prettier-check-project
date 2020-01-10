@@ -41,6 +41,7 @@ await ensureEmptyDirectory(tempDirectoryUrl)
     logLevel: "debug",
     projectDirectoryUrl: tempDirectoryUrl,
     prettierIgnoreFileRelativeUrl: "./.prettierignore",
+    // staged: true
   })
   const expected = {
     report: actual.report,
@@ -48,7 +49,8 @@ await ensureEmptyDirectory(tempDirectoryUrl)
       totalCount: 10,
       erroredCount: 1,
       ignoredCount: 1,
-      uglyCount: 7,
+      uglyCount: 0,
+      formattedCount: 7,
       prettyCount: 1,
     },
   }

@@ -1,16 +1,20 @@
 import { exec } from "child_process"
 import { resolveUrl } from "@jsenv/util"
-import { urlToMeta } from "@jsenv/url-meta"
+import { urlToMeta, normalizeSpecifierMetaMap } from "@jsenv/url-meta"
 
 export const collectStagedFiles = async ({ projectDirectoryUrl, specifierMetaMap, predicate }) => {
   // https://git-scm.com/docs/git-diff
   const gitDiffOutput = await runCommand("git diff --staged --name-only --diff-filter=AM")
-  const files = gitDiffOutput.split(/\n/g)
+  const files = gitDiffOutput.trim().split(/\r?\n/)
+  const specifierMetaMapNormalized = normalizeSpecifierMetaMap(
+    specifierMetaMap,
+    projectDirectoryUrl,
+  )
   return files.filter((relativePath) => {
     return predicate(
       urlToMeta({
         url: resolveUrl(relativePath, projectDirectoryUrl),
-        specifierMetaMap,
+        specifierMetaMap: specifierMetaMapNormalized,
       }),
     )
   })

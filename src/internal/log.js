@@ -7,24 +7,20 @@ import {
   uglyStyleWithIcon,
   prettyStyle,
   prettyStyleWithIcon,
+  formattedStyle,
+  formattedStyleWithIcon,
 } from "./style.js"
 
-export const createSummaryLog = ({
-  totalCount,
-  erroredCount,
-  ignoredCount,
-  uglyCount,
-  prettyCount,
-}) => {
-  if (totalCount === 0) return `done.`
+export const createSummaryLog = ({ totalCount, ...rest }) => {
+  if (totalCount === 0)
+    return `
+done.`
 
-  return `${createSummaryDetails({
-    totalCount,
-    erroredCount,
-    ignoredCount,
-    uglyCount,
-    prettyCount,
-  })}`
+  return `
+${createSummaryDetails({
+  totalCount,
+  ...rest,
+})}`
 }
 
 const createSummaryDetails = ({
@@ -32,6 +28,7 @@ const createSummaryDetails = ({
   erroredCount,
   ignoredCount,
   uglyCount,
+  formattedCount,
   prettyCount,
 }) => {
   if (erroredCount === totalCount) {
@@ -46,16 +43,26 @@ const createSummaryDetails = ({
   if (prettyCount === totalCount) {
     return `all ${prettyStyle("already formatted")}`
   }
+  if (formattedCount === totalCount) {
+    return `all ${formattedCount("formatted")}`
+  }
 
   return createMixedDetails({
     erroredCount,
     ignoredCount,
     uglyCount,
+    formattedCount,
     prettyCount,
   })
 }
 
-const createMixedDetails = ({ erroredCount, ignoredCount, uglyCount, prettyCount }) => {
+const createMixedDetails = ({
+  erroredCount,
+  ignoredCount,
+  uglyCount,
+  formattedCount,
+  prettyCount,
+}) => {
   const parts = []
 
   if (erroredCount) {
@@ -70,6 +77,10 @@ const createMixedDetails = ({ erroredCount, ignoredCount, uglyCount, prettyCount
     parts.push(`${uglyCount} ${uglyStyle("needs formatting")}`)
   }
 
+  if (formattedCount) {
+    parts.push(`${formattedCount} ${formattedStyle("formatted")}`)
+  }
+
   if (prettyCount) {
     parts.push(`${prettyCount} ${prettyStyle("already formatted")}`)
   }
@@ -77,17 +88,18 @@ const createMixedDetails = ({ erroredCount, ignoredCount, uglyCount, prettyCount
   return `${parts.join(", ")}.`
 }
 
-export const createErroredFileLog = ({
-  relativeUrl,
-  statusDetail,
-}) => `${relativeUrl} -> ${erroredStyleWithIcon("errored")}
+export const createErroredFileLog = ({ relativeUrl, statusDetail }) => `
+${relativeUrl} -> ${erroredStyleWithIcon("errored")}
 ${statusDetail}`
 
-export const createIgnoredFileLog = ({ relativeUrl }) =>
-  `${relativeUrl} -> ${ignoredStyleWithIcon("ignored")}`
+export const createIgnoredFileLog = ({ relativeUrl }) => `
+${relativeUrl} -> ${ignoredStyleWithIcon("ignored")}`
 
-export const createUglyFileLog = ({ relativeUrl }) =>
-  `${relativeUrl} -> ${uglyStyleWithIcon("needs formatting")}`
+export const createUglyFileLog = ({ relativeUrl }) => `
+${relativeUrl} -> ${uglyStyleWithIcon("needs formatting")}`
 
-export const createPrettyFileLog = ({ relativeUrl }) =>
-  `${relativeUrl} -> ${prettyStyleWithIcon("already formatted")}`
+export const createPrettyFileLog = ({ relativeUrl }) => `
+${relativeUrl} -> ${prettyStyleWithIcon("already formatted")}`
+
+export const createFormattedFileLog = ({ relativeUrl }) => `
+${relativeUrl} -> ${formattedStyleWithIcon("formatted")}`
