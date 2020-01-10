@@ -52,6 +52,7 @@ export const generatePrettierReportForFile = async (fileUrl, { prettierIgnoreFil
 
     return {
       status: STATUS_UGLY,
+      source,
       options,
     }
   } catch (e) {

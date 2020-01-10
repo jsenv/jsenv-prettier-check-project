@@ -21,7 +21,12 @@ import {
 } from "./internal/log.js"
 import { collectStagedFiles } from "./internal/collectStagedFiles.js"
 import { jsenvProjectFilesConfig } from "./jsenvProjectFilesConfig.js"
-import { resolveUrl, assertAndNormalizeDirectoryUrl } from "@jsenv/util"
+import {
+  resolveUrl,
+  assertAndNormalizeDirectoryUrl,
+  urlToFileSystemPath,
+  writeFile,
+} from "@jsenv/util"
 import { generatePrettierReportForFile } from "./internal/generatePrettierReportForFile.js"
 
 const { format } = import.meta.require("prettier")
@@ -88,15 +93,16 @@ export const formatWithPrettier = async ({
     await Promise.all(
       files.map(async ({ relativeUrl }) => {
         const fileUrl = resolveUrl(relativeUrl, projectDirectoryUrl)
-        const { status, statusDetail } = await generatePrettierReportForFile(fileUrl, {
+        const prettierReport = await generatePrettierReportForFile(fileUrl, {
           prettierIgnoreFileUrl,
         })
+        const { status, statusDetail } = prettierReport
 
         if (status === STATUS_NOT_SUPPORTED) {
           return
         }
 
-        report[relativeUrl] = { status, statusDetail }
+        report[relativeUrl] = prettierReport
 
         if (status === STATUS_ERRORED) {
           if (logErrored) {
@@ -135,16 +141,23 @@ export const formatWithPrettier = async ({
         (file) => report[file].status === STATUS_UGLY,
       )
       if (filesToFormat.length) {
-        logger.info(`formatting ${filesToFormat.length} files`)
         await Promise.all(
           filesToFormat.map(async (fileRelativeUrl) => {
-            logger.info(`format ${fileRelativeUrl}`)
             const fileUrl = resolveUrl(fileRelativeUrl, projectDirectoryUrl)
-            const options = report[fileRelativeUrl].options
-            await format(fileUrl, options)
+            const { source, options } = report[fileRelativeUrl]
+            try {
+              const sourceFormatted = await format(source, {
+                ...options,
+                filepath: urlToFileSystemPath(fileUrl),
+              })
+              await writeFile(fileUrl, sourceFormatted)
+              logger.info(`format ${fileRelativeUrl} -> ok`)
+            } catch (e) {
+              logger.info(`format ${fileRelativeUrl} -> error
+${e.stack}`)
+            }
           }),
         )
-        logger.info("formatting done.")
       }
     }
 
