@@ -1,93 +1,112 @@
 import {
   erroredStyle,
   erroredStyleWithIcon,
+  notSupportedStyleWithIcon,
   ignoredStyle,
   ignoredStyleWithIcon,
   uglyStyle,
   uglyStyleWithIcon,
   prettyStyle,
   prettyStyleWithIcon,
+  formattedStyle,
+  formattedStyleWithIcon,
 } from "./style.js"
 
-export const createSummaryLog = ({
-  totalCount,
-  erroredCount,
-  ignoredCount,
-  uglyCount,
-  prettyCount,
-}) => {
-  if (totalCount === 0) return `0 file checked.`
+export const createSummaryLog = ({ totalCount, ...rest }) => {
+  if (totalCount === 0)
+    return `
+done.`
 
-  return `${totalCount} file checked: ${createSummaryDetails({
-    totalCount,
-    erroredCount,
-    ignoredCount,
-    uglyCount,
-    prettyCount,
-  })}`
+  return `
+${createSummaryDetails({
+  totalCount,
+  ...rest,
+})}`
 }
 
 const createSummaryDetails = ({
   totalCount,
-  erroredCount,
   ignoredCount,
+  notSupportedCount,
+  erroredCount,
   uglyCount,
+  formattedCount,
   prettyCount,
 }) => {
+  if (prettyCount === totalCount) {
+    return `all ${prettyStyle("already formatted")}`
+  }
+  if (formattedCount === totalCount) {
+    return `all ${formattedCount("formatted")}`
+  }
   if (erroredCount === totalCount) {
     return `all ${erroredStyle("errored")}`
   }
-  if (ignoredCount === totalCount) {
-    return `all ${ignoredStyle("ignored")}`
+  if (ignoredCount + notSupportedCount === totalCount) {
+    return `all ${ignoredStyle("ignored or not supported")}`
   }
   if (uglyCount === totalCount) {
-    return `all ${uglyStyle("ugly")}`
-  }
-  if (prettyCount === totalCount) {
-    return `all ${prettyStyle("pretty")}`
+    return `all ${uglyStyle("needs formatting")}`
   }
 
   return createMixedDetails({
-    erroredCount,
     ignoredCount,
+    notSupportedCount,
+    erroredCount,
     uglyCount,
+    formattedCount,
     prettyCount,
   })
 }
 
-const createMixedDetails = ({ erroredCount, ignoredCount, uglyCount, prettyCount }) => {
+const createMixedDetails = ({
+  ignoredCount,
+  notSupportedCount,
+  erroredCount,
+  uglyCount,
+  formattedCount,
+  prettyCount,
+}) => {
   const parts = []
 
   if (erroredCount) {
     parts.push(`${erroredCount} ${erroredStyle("errored")}`)
   }
 
-  if (ignoredCount) {
-    parts.push(`${ignoredCount} ${ignoredStyle("ignored")}`)
-  }
-
-  if (uglyCount) {
-    parts.push(`${uglyCount} ${uglyStyle("ugly")}`)
+  if (formattedCount) {
+    parts.push(`${formattedCount} ${formattedStyle("formatted")}`)
   }
 
   if (prettyCount) {
-    parts.push(`${prettyCount} ${prettyStyle("pretty")}`)
+    parts.push(`${prettyCount} ${prettyStyle("already formatted")}`)
+  }
+
+  if (ignoredCount || notSupportedCount) {
+    parts.push(`${ignoredCount + notSupportedCount} ${ignoredStyle("ignored or not supported")}`)
+  }
+
+  if (uglyCount) {
+    parts.push(`${uglyCount} ${uglyStyle("needs formatting")}`)
   }
 
   return `${parts.join(", ")}.`
 }
 
-export const createErroredFileLog = ({
-  relativeUrl,
-  statusDetail,
-}) => `${relativeUrl} -> ${erroredStyleWithIcon("errored")}
+export const createIgnoredFileLog = ({ relativeUrl }) => `
+${relativeUrl} -> ${ignoredStyleWithIcon("ignored")}`
+
+export const createNotSupportedFileLog = ({ relativeUrl }) => `
+${relativeUrl} -> ${notSupportedStyleWithIcon("not supported")}`
+
+export const createErroredFileLog = ({ relativeUrl, statusDetail }) => `
+${relativeUrl} -> ${erroredStyleWithIcon("errored")}
 ${statusDetail}`
 
-export const createIgnoredFileLog = ({ relativeUrl }) =>
-  `${relativeUrl} -> ${ignoredStyleWithIcon("ignored")}`
+export const createUglyFileLog = ({ relativeUrl }) => `
+${relativeUrl} -> ${uglyStyleWithIcon("needs formatting")}`
 
-export const createUglyFileLog = ({ relativeUrl }) =>
-  `${relativeUrl} -> ${uglyStyleWithIcon("ugly")}`
+export const createFormattedFileLog = ({ relativeUrl }) => `
+${relativeUrl} -> ${formattedStyleWithIcon("formatted")}`
 
-export const createPrettyFileLog = ({ relativeUrl }) =>
-  `${relativeUrl} -> ${prettyStyleWithIcon("pretty")}`
+export const createPrettyFileLog = ({ relativeUrl }) => `
+${relativeUrl} -> ${prettyStyleWithIcon("already formatted")}`

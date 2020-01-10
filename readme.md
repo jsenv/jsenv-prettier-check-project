@@ -2,43 +2,49 @@
 
 [![github package](https://img.shields.io/github/package-json/v/jsenv/jsenv-prettier-check-project.svg?label=package&logo=github)](https://github.com/jsenv/jsenv-prettier-check-project/packages)
 [![npm package](https://img.shields.io/npm/v/@jsenv/prettier-check-project.svg?logo=npm&label=package)](https://www.npmjs.com/package/@jsenv/prettier-check-project)
-[![ci status](https://github.com/jsenv/jsenv-prettier-check-project/workflows/ci/badge.svg)](https://github.com/jsenv/jsenv-prettier-check-project/actions)
+[![github ci](https://github.com/jsenv/jsenv-prettier-check-project/workflows/ci/badge.svg)](https://github.com/jsenv/jsenv-prettier-check-project/actions?workflow=ci)
 [![codecov](https://codecov.io/gh/jsenv/jsenv-prettier-check-project/branch/master/graph/badge.svg)](https://codecov.io/gh/jsenv/jsenv-prettier-check-project)
 
-Ensure your files where formatted with prettier.
+Format staged or project files with prettier.
 
-## Introduction
+# Table of contents
 
-This package was designed to run in a continuous workflow to verify that your files where formatted with prettier. Any file prettier can format that is not formatted with it is considered as a problem and fails your build.
+- [Presentation](#Presentation)
+- [Usage](#Usage)
+  - [formatWithPrettier](#formatWithPrettier)
+- [Installation](#Installation)
 
-## How to use
+## Presentation
 
-Create a file like this:
+This package was designed to:
+
+- format staged files with prettier, prefect in a precommit hook.
+- format your project files with prettier.
+- get an overwiew of your files already formatted or needing to be formatted.
+
+## Usage
+
+### formatWithPrettier
+
+> `formatWithPrettier` is an async function collecting files to format them with prettier. It also logs progression and return summary and report objects.
 
 ```js
-const { prettierCheckProject } = require("@jsenv/prettier-check-project")
+import { formatWithPrettier } from "@jsenv/util"
 
-prettierCheckProject({
+const { summary, report } = await formatWithPrettier({
   projectDirectoryUrl: "file:///Users/you/directory",
+  prettierIgnoreFileRelativeUrl: ".prettierignore",
+  projectFilesConfig: {
+    "./src/": true,
+    "./*": true,
+  },
 })
 ```
 
-And run it during your continuous workflow.
-
-By default the script will set process.exitCode to 1 if one or more file are not formatted using prettier.<br />
-You can control this by passing `updateProcessExitCode`.
-
-```js
-const { prettierCheckProject } = require("@jsenv/prettier-check-project")
-
-prettierCheckProject({
-  projectDirectoryUrl: "file:///Users/you/folder/",
-  updateProcessExitCode: false,
-})
-```
+— source code at [src/formatWithPrettier.js](./src/formatWithPrettier.js).
 
 ## Installation
 
 ```console
-npm install @jsenv/prettier-check-project@4.2.0
+npm install @jsenv/prettier-check-project@5.0.0
 ```
