@@ -19,6 +19,7 @@ await ensureEmptyDirectory(tempDirectoryUrl)
   const uglyAndExcludedJavaScriptFileUrl = resolveUrl("node_modules/ugly.js", tempDirectoryUrl)
   const uglyAndIgnoredFileUrl = resolveUrl("ignored.js", tempDirectoryUrl)
   const prettierIgnoreFileUrl = resolveUrl(".prettierignore", tempDirectoryUrl)
+  const notSupportedFileUrl = resolveUrl("file", tempDirectoryUrl)
   await writeFile(uglyJsonFileUrl, `{  }`)
   await writeFile(uglyMarkdownFileUrl, `## Title`)
   await writeFile(uglyJavaScriptFileUrl, `export const a = true;`)
@@ -36,6 +37,7 @@ await ensureEmptyDirectory(tempDirectoryUrl)
   await writeFile(uglyAndExcludedJavaScriptFileUrl, `export const a = true;`)
   await writeFile(prettierIgnoreFileUrl, "ignored.js")
   await writeFile(uglyAndIgnoredFileUrl, "export const a = true;")
+  await writeFile(notSupportedFileUrl, "hello")
 
   const actual = await formatWithPrettier({
     logLevel: "debug",
@@ -46,9 +48,10 @@ await ensureEmptyDirectory(tempDirectoryUrl)
   const expected = {
     report: actual.report,
     summary: {
-      totalCount: 10,
-      erroredCount: 1,
+      totalCount: 13,
       ignoredCount: 1,
+      notSupportedCount: 3,
+      erroredCount: 1,
       uglyCount: 0,
       formattedCount: 7,
       prettyCount: 1,

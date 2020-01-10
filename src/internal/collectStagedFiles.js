@@ -5,12 +5,12 @@ import { urlToMeta, normalizeSpecifierMetaMap } from "@jsenv/url-meta"
 export const collectStagedFiles = async ({ projectDirectoryUrl, specifierMetaMap, predicate }) => {
   // https://git-scm.com/docs/git-diff
   const gitDiffOutput = await runCommand("git diff --staged --name-only --diff-filter=AM")
-  const files = gitDiffOutput.trim().split(/\r?\n/)
+  const stagedFiles = gitDiffOutput.trim().split(/\r?\n/)
   const specifierMetaMapNormalized = normalizeSpecifierMetaMap(
     specifierMetaMap,
     projectDirectoryUrl,
   )
-  return files.filter((relativePath) => {
+  return stagedFiles.filter((relativePath) => {
     return predicate(
       urlToMeta({
         url: resolveUrl(relativePath, projectDirectoryUrl),

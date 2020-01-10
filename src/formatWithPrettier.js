@@ -19,6 +19,7 @@ import {
   createPrettyFileLog,
   createSummaryLog,
   createFormattedFileLog,
+  createNotSupportedFileLog,
 } from "./internal/log.js"
 import { collectStagedFiles } from "./internal/collectStagedFiles.js"
 import { collectProjectFiles } from "./internal/collectProjectFiles.js"
@@ -40,10 +41,11 @@ export const formatWithPrettier = async ({
   jsenvDirectoryRelativeUrl = ".jsenv",
   prettierIgnoreFileRelativeUrl = ".prettierignore",
   projectFilesConfig = jsenvProjectFilesConfig,
-  staged = process.execArgv.includes("--staged"),
-  check = process.execArgv.includes("--check"),
-  logErrored = true,
+  staged = process.argv.includes("--staged"),
+  dryRun = process.argv.includes("--dry-run"),
   logIgnored = false,
+  logNotSupported = false,
+  logErrored = true,
   logUgly = true,
   logFormatted = true,
   logPretty = false,
@@ -71,25 +73,33 @@ export const formatWithPrettier = async ({
 
     let files
     if (staged) {
-      files = await collectStagedFiles({
+      const stagedFiles = await collectStagedFiles({
         cancellationToken,
         projectDirectoryUrl,
         specifierMetaMap,
         predicate: (meta) => meta.prettify === true,
       })
+      files = stagedFiles
     } else {
-      files = await collectProjectFiles({
+      const projectFiles = await collectProjectFiles({
         cancellationToken,
         projectDirectoryUrl,
         specifierMetaMap,
         predicate: (meta) => meta.prettify === true,
       })
+      files = projectFiles
     }
 
+    const fileOrigin = staged ? "staged" : "project"
+
     if (files.length === 0) {
-      logger.info(`no file format to check.`)
+      logger.info(`no ${fileOrigin} file to ${dryRun ? "check (dryRun enabled)" : "format"}`)
     } else {
-      logger.info(`checking ${files.length} files format.`)
+      logger.info(
+        `${files.length} ${fileOrigin} file${files.length === 1 ? "" : "s"} to ${
+          dryRun ? "check (dryRun enabled)" : "format"
+        }`,
+      )
     }
 
     const report = {}
@@ -101,11 +111,14 @@ export const formatWithPrettier = async ({
         })
         const { status, statusDetail, options, source } = prettierReport
 
+        report[relativeUrl] = prettierReport
+
         if (status === STATUS_NOT_SUPPORTED) {
+          if (logNotSupported) {
+            logger.info(createNotSupportedFileLog({ relativeUrl }))
+          }
           return
         }
-
-        report[relativeUrl] = prettierReport
 
         if (status === STATUS_ERRORED) {
           if (logErrored) {
@@ -122,7 +135,7 @@ export const formatWithPrettier = async ({
         }
 
         if (status === STATUS_UGLY) {
-          if (check) {
+          if (dryRun) {
             if (logUgly) {
               logger.info(createUglyFileLog({ relativeUrl }))
             }
@@ -168,6 +181,7 @@ const summarizeReport = (report) => {
   const fileArray = Object.keys(report)
 
   const erroredArray = fileArray.filter((file) => report[file].status === STATUS_ERRORED)
+  const notSupportedArray = fileArray.filter((file) => report[file].status === STATUS_NOT_SUPPORTED)
   const ignoredArray = fileArray.filter((file) => report[file].status === STATUS_IGNORED)
   const uglyArray = fileArray.filter((file) => report[file].status === STATUS_UGLY)
   const formattedArray = fileArray.filter((file) => report[file].status === STATUS_FORMATTED)
@@ -175,8 +189,9 @@ const summarizeReport = (report) => {
 
   return {
     totalCount: fileArray.length,
-    erroredCount: erroredArray.length,
     ignoredCount: ignoredArray.length,
+    notSupportedCount: notSupportedArray.length,
+    erroredCount: erroredArray.length,
     uglyCount: uglyArray.length,
     formattedCount: formattedArray.length,
     prettyCount: prettyArray.length,
