@@ -1,6 +1,6 @@
 {
   "name": "@jsenv/prettier-check-project",
-  "description": "Ensure your files where formatted with prettier.",
+  "description": "Format staged or project files with prettier.",
   "version": "5.0.0-alpha.1",
   "license": "MIT",
   "repository": {
