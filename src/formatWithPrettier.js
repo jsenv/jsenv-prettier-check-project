@@ -165,7 +165,7 @@ export const formatWithPrettier = async ({
       logger.info(`${createSummaryLog(summary)}`)
     }
 
-    if (updateProcessExitCode) {
+    if (dryRun && updateProcessExitCode) {
       if (summary.erroredCount > 0 || summary.uglyCount > 0) {
         process.exitCode = 1
       } else {
