@@ -1,6 +1,7 @@
 /.jsenv/
 /coverage/
 /dist/
+/docs/basic-project/
 /node_modules/
 /test/**/temp/
 /importMap.json
