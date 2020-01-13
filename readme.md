@@ -11,7 +11,7 @@ Format staged or project files with prettier.
 
 - [Presentation](#Presentation)
 - [Installation](#Installation)
-- [Documentation]
+- [Documentation](#Documentation)
   - [formatWithPrettier](#formatWithPrettier)
 
 # Presentation
