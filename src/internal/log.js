@@ -37,7 +37,7 @@ const createSummaryDetails = ({
     return `all ${prettyStyle("already formatted")}`
   }
   if (formattedCount === totalCount) {
-    return `all ${formattedCount("formatted")}`
+    return `all ${formattedStyle("formatted")}`
   }
   if (erroredCount === totalCount) {
     return `all ${erroredStyle("errored")}`
