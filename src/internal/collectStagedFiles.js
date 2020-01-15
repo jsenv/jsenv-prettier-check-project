@@ -1,6 +1,5 @@
 import { exec } from "child_process"
-import { resolveUrl } from "@jsenv/util"
-import { urlToMeta, normalizeSpecifierMetaMap } from "@jsenv/url-meta"
+import { resolveUrl, urlToMeta, normalizeSpecifierMetaMap } from "@jsenv/util"
 
 export const collectStagedFiles = async ({ projectDirectoryUrl, specifierMetaMap, predicate }) => {
   // https://git-scm.com/docs/git-diff

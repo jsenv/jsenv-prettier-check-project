@@ -1,3 +1,4 @@
+import { createRequire } from "module"
 import {
   STATUS_NOT_SUPPORTED,
   STATUS_IGNORED,
@@ -7,7 +8,8 @@ import {
 } from "./STATUS.js"
 import { urlToFileSystemPath, readFile } from "@jsenv/util"
 
-const { resolveConfig, getFileInfo, check } = import.meta.require("prettier")
+const require = createRequire(import.meta.url)
+const { resolveConfig, getFileInfo, check } = require("prettier")
 
 export const generatePrettierReportForFile = async (fileUrl, { prettierIgnoreFileUrl } = {}) => {
   const filePath = urlToFileSystemPath(fileUrl)

@@ -1,4 +1,4 @@
-import { collectFiles } from "@jsenv/file-collector"
+import { collectFiles } from "@jsenv/util"
 
 export const collectProjectFiles = async ({
   cancellationToken,

@@ -2,6 +2,7 @@
 /.jsenv/
 /coverage/
 /dist/
+/docs/basic-project/node_modules/
 /test/basic/errored.js
 /node_modules/
 !.eslintrc.js
