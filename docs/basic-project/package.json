@@ -8,7 +8,7 @@
     "prettier-check": "node ./script/prettier-format.js --dry-run"
   },
   "devDependencies": {
-    "@jsenv/prettier-check-project": "5.1.0",
+    "@jsenv/prettier-check-project": "5.2.0-alpha.1",
     "prettier": "1.19.1"
   }
 }
