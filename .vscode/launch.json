@@ -7,6 +7,7 @@
       "request": "launch",
       "protocol": "inspector",
       "program": "${file}",
+      "runtimeVersion": "13.6.0",
       "autoAttachChildProcesses": true,
       "sourceMaps": true,
       "smartStep": true,
@@ -36,7 +37,6 @@
         "node_modules/@dmail/cancellation/**",
         "node_modules/rollup/**",
         "node_modules/@rollup/**",
-        "node_modules/prettier/**",
         "<node_internals>/**/*.js"
       ]
     },
@@ -53,7 +53,6 @@
         "node_modules/@dmail/cancellation/**",
         "node_modules/rollup/**",
         "node_modules/@rollup/**",
-        "node_modules/prettier/**",
         "<node_internals>/**/*.js"
       ]
     },

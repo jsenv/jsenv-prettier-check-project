@@ -1,4 +1,12 @@
-import { metaMapToSpecifierMetaMap } from "@jsenv/url-meta"
+/* eslint-disable import/max-dependencies */
+import { createRequire } from "module"
+import {
+  metaMapToSpecifierMetaMap,
+  resolveUrl,
+  assertAndNormalizeDirectoryUrl,
+  urlToFileSystemPath,
+  writeFile,
+} from "@jsenv/util"
 import {
   catchAsyncFunctionCancellation,
   createCancellationTokenForProcessSIGINT,
@@ -24,15 +32,11 @@ import {
 import { collectStagedFiles } from "./internal/collectStagedFiles.js"
 import { collectProjectFiles } from "./internal/collectProjectFiles.js"
 import { jsenvProjectFilesConfig } from "./jsenvProjectFilesConfig.js"
-import {
-  resolveUrl,
-  assertAndNormalizeDirectoryUrl,
-  urlToFileSystemPath,
-  writeFile,
-} from "@jsenv/util"
+
 import { generatePrettierReportForFile } from "./internal/generatePrettierReportForFile.js"
 
-const { format } = import.meta.require("prettier")
+const require = createRequire(import.meta.url)
+const { format } = require("prettier")
 
 export const formatWithPrettier = async ({
   logLevel,

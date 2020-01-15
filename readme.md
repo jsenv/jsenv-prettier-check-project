@@ -33,7 +33,7 @@ This package was designed to:
 # Installation
 
 ```console
-npm install @jsenv/prettier-check-project@5.1.0
+npm install @jsenv/prettier-check-project@5.2.0
 ```
 
 ```js
