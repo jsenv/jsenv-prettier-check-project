@@ -9,7 +9,7 @@
       "program": "${file}",
       "runtimeVersion": "13.6.0",
       "autoAttachChildProcesses": true,
-      "sourceMaps": true,
+      // "sourceMaps": false,
       "smartStep": true,
       "skipFiles": [
         // force-array-multiline
