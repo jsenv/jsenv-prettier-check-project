@@ -38,6 +38,7 @@
         "node_modules/@dmail/cancellation/**",
         "node_modules/rollup/**",
         "node_modules/@rollup/**",
+        "node_modules/prettier/**",
         "<node_internals>/**/*.js"
       ]
     },
