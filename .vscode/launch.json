@@ -9,7 +9,7 @@
       "program": "${file}",
       "runtimeVersion": "13.6.0",
       "autoAttachChildProcesses": true,
-      "sourceMaps": true,
+      // "sourceMaps": false,
       "smartStep": true,
       "skipFiles": [
         // force-array-multiline
@@ -38,6 +38,7 @@
         "node_modules/@dmail/cancellation/**",
         "node_modules/rollup/**",
         "node_modules/@rollup/**",
+        "node_modules/prettier/**",
         "<node_internals>/**/*.js"
       ]
     },

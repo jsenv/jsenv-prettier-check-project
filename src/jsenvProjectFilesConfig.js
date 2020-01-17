@@ -22,6 +22,7 @@ export const jsenvProjectFilesConfig = {
   "./script/": true,
   "./*": true,
 
-  "./node_modules/": false, // just to be safe exclude node_modules
-  "./.git/": false, // and git folder
+  // just to be safe exclude node_modules/ and .git/
+  "./**/node_modules/": false,
+  "./**/.git/": false,
 }

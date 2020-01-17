@@ -47,12 +47,6 @@ export const formatWithPrettier = async ({
   projectFilesConfig = jsenvProjectFilesConfig,
   staged = process.argv.includes("--staged"),
   dryRun = process.argv.includes("--dry-run"),
-  logIgnored = false,
-  logNotSupported = false,
-  logErrored = true,
-  logUgly = true,
-  logFormatted = true,
-  logPretty = false,
   logSummary = true,
   updateProcessExitCode = false,
 }) => {
@@ -109,60 +103,46 @@ export const formatWithPrettier = async ({
     const report = {}
     await Promise.all(
       files.map(async (relativeUrl) => {
+        const fileReport = {}
+        report[relativeUrl] = fileReport
+
         const fileUrl = resolveUrl(relativeUrl, projectDirectoryUrl)
         const prettierReport = await generatePrettierReportForFile(fileUrl, {
           prettierIgnoreFileUrl,
         })
         const { status, statusDetail, options, source } = prettierReport
 
-        report[relativeUrl] = prettierReport
+        fileReport.status = status
+        fileReport.statusDetail = statusDetail
 
-        if (status === STATUS_NOT_SUPPORTED) {
-          if (logNotSupported) {
-            logger.info(createNotSupportedFileLog({ relativeUrl }))
-          }
-          return
-        }
-
-        if (status === STATUS_ERRORED) {
-          if (logErrored) {
-            logger.error(createErroredFileLog({ relativeUrl, statusDetail }))
-          }
-          return
-        }
-
-        if (status === STATUS_IGNORED) {
-          if (logIgnored) {
-            logger.debug(createIgnoredFileLog({ relativeUrl }))
-          }
-          return
-        }
-
-        if (status === STATUS_UGLY) {
-          if (dryRun) {
-            if (logUgly) {
-              logger.info(createUglyFileLog({ relativeUrl }))
-            }
-            return
-          }
-
+        if (status === STATUS_UGLY && !dryRun) {
           const sourceFormatted = await format(source, {
             ...options,
             filepath: urlToFileSystemPath(fileUrl),
           })
           await writeFile(fileUrl, sourceFormatted)
-          prettierReport.status = STATUS_FORMATTED
-          if (logFormatted) {
-            logger.info(createFormattedFileLog({ relativeUrl }))
-          }
-          return
-        }
-
-        if (logPretty) {
-          logger.debug(createPrettyFileLog({ relativeUrl }))
+          fileReport.status = STATUS_FORMATTED
         }
       }),
     )
+
+    Object.keys(report).forEach((relativeUrl) => {
+      const { status, statusDetail } = report[relativeUrl]
+
+      if (status === STATUS_NOT_SUPPORTED) {
+        logger.info(createNotSupportedFileLog({ relativeUrl }))
+      } else if (status === STATUS_ERRORED) {
+        logger.error(createErroredFileLog({ relativeUrl, statusDetail }))
+      } else if (status === STATUS_IGNORED) {
+        logger.debug(createIgnoredFileLog({ relativeUrl }))
+      } else if (status === STATUS_UGLY) {
+        logger.warn(createUglyFileLog({ relativeUrl }))
+      } else if (status === STATUS_FORMATTED) {
+        logger.info(createFormattedFileLog({ relativeUrl }))
+      } else if (status === STATUS_PRETTY) {
+        logger.debug(createPrettyFileLog({ relativeUrl }))
+      }
+    })
 
     const summary = summarizeReport(report)
     if (files.length && logSummary) {

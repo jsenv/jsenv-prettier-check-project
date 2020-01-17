@@ -1,11 +1,11 @@
 import { assert } from "@jsenv/assert"
 import { ensureEmptyDirectory, resolveUrl, writeFile, readFile } from "@jsenv/util"
-import { formatWithPrettier } from "../../index.js"
+import { formatWithPrettier } from "../index.js"
 
 const tempDirectoryUrl = import.meta.resolve("./temp/")
-await ensureEmptyDirectory(tempDirectoryUrl)
 
 {
+  await ensureEmptyDirectory(tempDirectoryUrl)
   const uglyJsonFileUrl = resolveUrl("ugly.json", tempDirectoryUrl)
   const uglyMarkdownFileUrl = resolveUrl("ugly.md", tempDirectoryUrl)
   const textFileUrl = resolveUrl("file.txt", tempDirectoryUrl)
@@ -46,7 +46,60 @@ await ensureEmptyDirectory(tempDirectoryUrl)
     // staged: true
   })
   const expected = {
-    report: actual.report,
+    report: {
+      ".prettierignore": {
+        status: "not-supported",
+        statusDetail: undefined,
+      },
+      "error.js": {
+        status: "errored",
+        statusDetail: actual.report["error.js"].statusDetail, // this a syntax error
+      },
+      "file": {
+        status: "not-supported",
+        statusDetail: undefined,
+      },
+      "file.txt": {
+        status: "not-supported",
+        statusDetail: undefined,
+      },
+      "ignored.js": {
+        status: "ignored",
+        statusDetail: undefined,
+      },
+      "pretty.js": {
+        status: "pretty",
+        statusDetail: undefined,
+      },
+      "ugly.css": {
+        status: "formatted",
+        statusDetail: undefined,
+      },
+      "ugly.html": {
+        status: "formatted",
+        statusDetail: undefined,
+      },
+      "ugly.js": {
+        status: "formatted",
+        statusDetail: undefined,
+      },
+      "ugly.json": {
+        status: "formatted",
+        statusDetail: undefined,
+      },
+      "ugly.jsx": {
+        status: "formatted",
+        statusDetail: undefined,
+      },
+      "ugly.md": {
+        status: "formatted",
+        statusDetail: undefined,
+      },
+      "ugly.yml": {
+        status: "formatted",
+        statusDetail: undefined,
+      },
+    },
     summary: {
       totalCount: 13,
       ignoredCount: 1,
@@ -90,6 +143,4 @@ await ensureEmptyDirectory(tempDirectoryUrl)
     }
     assert({ actual, expected })
   }
-
-  await ensureEmptyDirectory(tempDirectoryUrl)
 }
