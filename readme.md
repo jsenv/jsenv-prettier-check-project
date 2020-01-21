@@ -19,22 +19,8 @@ Format staged or project files with prettier.
 This package was designed to:
 
 - format staged files with prettier, prefect in a precommit hook.
-
-![recording of node terminal while formatting staged files](./docs/recording-node-terminal-format-staged.gif)
-
 - get an overwiew of your files state regarding prettier formatting.
-
-![recording of node terminal while checking project files format](./docs/recording-node-terminal-dry-run.gif)
-
 - format your project files at once.
-
-![recording of node terminal while formatting project files](./docs/recording-node-terminal-format.gif)
-
-# Installation
-
-```console
-npm install @jsenv/prettier-check-project@5.2.0
-```
 
 ```js
 const { formatWithPrettier } = require("@jsenv/prettier-check-project")
@@ -44,6 +30,14 @@ formatWithPrettier({
 })
 ```
 
+![node terminal screenshot](./docs/screenshot-node-terminal.png)
+
+# Installation
+
+```console
+npm install @jsenv/prettier-check-project@5.4.0
+```
+
 # Documentation
 
 ## formatWithPrettier
@@ -51,7 +45,7 @@ formatWithPrettier({
 `formatWithPrettier` is an async function collecting files to format them with prettier. It also logs progression and return summary and report objects.
 
 ```js
-import { formatWithPrettier } from "@jsenv/prettier-check-project"
+const { formatWithPrettier } = require("@jsenv/prettier-check-project")
 
 const { summary, report } = await formatWithPrettier({
   projectDirectoryUrl: "file:///Users/you/directory",

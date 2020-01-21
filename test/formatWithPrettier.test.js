@@ -2,10 +2,8 @@ import { assert } from "@jsenv/assert"
 import { ensureEmptyDirectory, resolveUrl, writeFile, readFile } from "@jsenv/util"
 import { formatWithPrettier } from "../index.js"
 
-const tempDirectoryUrl = import.meta.resolve("./temp/")
-
 {
-  await ensureEmptyDirectory(tempDirectoryUrl)
+  const tempDirectoryUrl = resolveUrl("./temp/", import.meta.url)
   const uglyJsonFileUrl = resolveUrl("ugly.json", tempDirectoryUrl)
   const uglyMarkdownFileUrl = resolveUrl("ugly.md", tempDirectoryUrl)
   const textFileUrl = resolveUrl("file.txt", tempDirectoryUrl)
@@ -20,6 +18,7 @@ const tempDirectoryUrl = import.meta.resolve("./temp/")
   const uglyAndIgnoredFileUrl = resolveUrl("ignored.js", tempDirectoryUrl)
   const prettierIgnoreFileUrl = resolveUrl(".prettierignore", tempDirectoryUrl)
   const notSupportedFileUrl = resolveUrl("file", tempDirectoryUrl)
+  await ensureEmptyDirectory(tempDirectoryUrl)
   await writeFile(uglyJsonFileUrl, `{  }`)
   await writeFile(uglyMarkdownFileUrl, `## Title`)
   await writeFile(uglyJavaScriptFileUrl, `export const a = true;`)

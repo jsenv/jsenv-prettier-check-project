@@ -91,11 +91,11 @@ export const formatWithPrettier = async ({
     const fileOrigin = staged ? "staged" : "project"
 
     if (files.length === 0) {
-      logger.info(`no ${fileOrigin} file to ${dryRun ? "check (dryRun enabled)" : "format"}`)
+      logger.info(`no ${fileOrigin} file to ${dryRun ? "check (dryRun enabled)" : "check"}`)
     } else {
       logger.info(
         `${files.length} ${fileOrigin} file${files.length === 1 ? "" : "s"} to ${
-          dryRun ? "check (dryRun enabled)" : "format"
+          dryRun ? "check (dryRun enabled)" : "check"
         }`,
       )
     }
@@ -130,7 +130,7 @@ export const formatWithPrettier = async ({
       const { status, statusDetail } = report[relativeUrl]
 
       if (status === STATUS_NOT_SUPPORTED) {
-        logger.info(createNotSupportedFileLog({ relativeUrl }))
+        logger.debug(createNotSupportedFileLog({ relativeUrl }))
       } else if (status === STATUS_ERRORED) {
         logger.error(createErroredFileLog({ relativeUrl, statusDetail }))
       } else if (status === STATUS_IGNORED) {
