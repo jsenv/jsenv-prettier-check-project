@@ -48,6 +48,7 @@ npm install @jsenv/prettier-check-project@5.4.0
 const { formatWithPrettier } = require("@jsenv/prettier-check-project")
 
 const { summary, report } = await formatWithPrettier({
+  logLevel: "debug",
   projectDirectoryUrl: "file:///Users/you/directory",
   prettierIgnoreFileRelativeUrl: ".prettierignore",
   projectFilesConfig: {
