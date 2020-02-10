@@ -6,11 +6,9 @@ import {
   assertAndNormalizeDirectoryUrl,
   urlToFileSystemPath,
   writeFile,
+  catchCancellation,
+  createCancellationTokenForProcess,
 } from "@jsenv/util"
-import {
-  catchAsyncFunctionCancellation,
-  createCancellationTokenForProcessSIGINT,
-} from "@jsenv/cancellation"
 import { createLogger } from "@jsenv/logger"
 import {
   STATUS_NOT_SUPPORTED,
@@ -39,8 +37,8 @@ const require = createRequire(import.meta.url)
 const { format } = require("prettier")
 
 export const formatWithPrettier = async ({
+  cancellationToken = createCancellationTokenForProcess(),
   logLevel,
-  cancellationToken = createCancellationTokenForProcessSIGINT(),
   projectDirectoryUrl,
   jsenvDirectoryRelativeUrl = ".jsenv",
   prettierIgnoreFileRelativeUrl = ".prettierignore",
@@ -50,16 +48,16 @@ export const formatWithPrettier = async ({
   logSummary = true,
   updateProcessExitCode = false,
 }) => {
-  const logger = createLogger({ logLevel })
+  return catchCancellation(async () => {
+    const logger = createLogger({ logLevel })
 
-  projectDirectoryUrl = assertAndNormalizeDirectoryUrl(projectDirectoryUrl)
-  if (typeof projectFilesConfig !== "object") {
-    throw new TypeError(`projectFilesConfig must be an object, got ${projectFilesConfig}`)
-  }
+    projectDirectoryUrl = assertAndNormalizeDirectoryUrl(projectDirectoryUrl)
+    if (typeof projectFilesConfig !== "object") {
+      throw new TypeError(`projectFilesConfig must be an object, got ${projectFilesConfig}`)
+    }
 
-  const prettierIgnoreFileUrl = resolveUrl(prettierIgnoreFileRelativeUrl, projectDirectoryUrl)
+    const prettierIgnoreFileUrl = resolveUrl(prettierIgnoreFileRelativeUrl, projectDirectoryUrl)
 
-  return catchAsyncFunctionCancellation(async () => {
     const specifierMetaMap = metaMapToSpecifierMetaMap({
       prettify: {
         ...projectFilesConfig,
@@ -158,6 +156,12 @@ export const formatWithPrettier = async ({
     }
 
     return { report, summary }
+  }).catch((e) => {
+    // this is required to ensure unhandledRejection will still
+    // set process.exitCode to 1 marking the process execution as errored
+    // preventing further command to run
+    process.exitCode = 1
+    throw e
   })
 }
 
