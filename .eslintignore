@@ -1,8 +1,8 @@
 !./github/
+/.github/**/node_modules/
 /.jsenv/
 /coverage/
 /dist/
-/docs/basic-project/node_modules/
-/test/basic/errored.js
+/test/temp/
 /node_modules/
 !.eslintrc.js
