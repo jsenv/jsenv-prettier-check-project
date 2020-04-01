@@ -3,7 +3,6 @@
 /dist/
 /node_modules/
 /test/**/temp/
-/importMap.json
 /jsconfig.json
 /secrets.json
 /package-lock.json
