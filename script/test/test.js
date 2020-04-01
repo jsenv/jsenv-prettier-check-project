@@ -12,4 +12,3 @@ executeTestPlan({
   },
   completedExecutionLogMerging: true,
 })
-
