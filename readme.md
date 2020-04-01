@@ -11,8 +11,7 @@ Format staged or project files with prettier.
 
 - [Presentation](#Presentation)
 - [Installation](#Installation)
-- [Documentation](#Documentation)
-  - [formatWithPrettier](#formatWithPrettier)
+- [formatWithPrettier](#formatWithPrettier)
 
 # Presentation
 
@@ -23,7 +22,7 @@ This package was designed to:
 - format your project files at once.
 
 ```js
-const { formatWithPrettier } = require("@jsenv/prettier-check-project")
+import { formatWithPrettier } from "@jsenv/prettier-check-project"
 
 formatWithPrettier({
   projectDirectoryUrl: "file:///directory",
@@ -35,17 +34,15 @@ formatWithPrettier({
 # Installation
 
 ```console
-npm install @jsenv/prettier-check-project@5.4.0
+npm install @jsenv/prettier-check-project
 ```
 
-# Documentation
-
-## formatWithPrettier
+# formatWithPrettier
 
 `formatWithPrettier` is an async function collecting files to format them with prettier. It also logs progression and return summary and report objects.
 
 ```js
-const { formatWithPrettier } = require("@jsenv/prettier-check-project")
+import { formatWithPrettier } from "@jsenv/prettier-check-project"
 
 const { summary, report } = await formatWithPrettier({
   logLevel: "debug",
