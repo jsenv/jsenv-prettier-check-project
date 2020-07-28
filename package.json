@@ -45,14 +45,16 @@
   "dependencies": {
     "@jsenv/cancellation": "1.4.2",
     "@jsenv/logger": "3.3.1",
-    "@jsenv/util": "3.5.2"
+    "@jsenv/util": "3.6.3"
   },
   "devDependencies": {
     "@jsenv/assert": "2.2.1",
     "@jsenv/codecov-upload": "3.4.1",
     "@jsenv/core": "14.0.0",
     "@jsenv/eslint-config": "12.5.0",
+    "@jsenv/github-release-package": "1.2.2",
     "@jsenv/node-module-import-map": "12.0.1",
+    "@jsenv/package-publish": "1.5.1",
     "@jsenv/prettier-check-project": "5.6.0",
     "babel-eslint": "11.0.0-beta.0",
     "eslint": "7.5.0",
